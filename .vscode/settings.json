@@ -1,0 +1,8 @@
+{
+    "appService.zipIgnorePattern": [
+        "node_modules{,/**}",
+        ".vscode{,/**}"
+    ],
+    "appService.deploySubpath": ".",
+    "appService.defaultWebAppToDeploy": "/subscriptions/aff02441-ac0d-42bf-a7fc-2e8f9a1dda07/resourceGroups/appsvc_linux_centralus/providers/Microsoft.Web/sites/api-marketplace"
+}
