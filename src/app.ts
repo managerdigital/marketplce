@@ -14,7 +14,7 @@ dotenv.config({
 console.log('NODE_ENV: ', process.env.NODE_ENV);
 console.log('APP_ENV: ', process.env.APP_ENV);
 // ====================================================================================================
-
+import * as functions from "firebase-functions";
 import express = require('express');
 import cors = require('cors');
 
@@ -80,9 +80,9 @@ loadContainer(app);
 
 // Controllers
 app.use(loadControllers(
-    'controllers/*.ts',
+    'controllers/*.js',
     {cwd: __dirname}
 ));
-
-
-export { app };
+    
+export const market = functions.https.onRequest( app );
+    

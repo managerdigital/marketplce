@@ -15,6 +15,8 @@ import { ClienteService } from './services/clientes.service';
 import { PedidoService } from './services/pedidos.service';
 import { BalanceService } from './services/balance.service';
 import { CalificacionService } from './services/calificacion.service';
+import { PromocionService } from './services/promociones.service';
+import { VentasProductosLocatariosService } from './services/ventasProductosLocatarios.service';
 
 
 import { AdminPGRepository } from './services/repositories/implementation/pg/admin.imp';
@@ -28,6 +30,8 @@ import { ClientePGRepository } from './services/repositories/implementation/pg/c
 import { PedidoPGRepository } from './services/repositories/implementation/pg/pedidos.imp';
 import { BalancePGRepository } from './services/repositories/implementation/pg/balance.imp';
 import { CalificacionPGRepository } from './services/repositories/implementation/pg/calificaciones.imp';
+import { PromocionesPGRepository } from './services/repositories/implementation/pg/promociones.imp';
+import { VentasProductosLocatariosPGRepository } from './services/repositories/implementation/pg/ventasProductosLocatarios.imp';
 
 
 
@@ -51,6 +55,8 @@ export default (app: express.Application): void => {
         pedidoRepository: asClass(PedidoPGRepository).scoped(),
         balanceRepository: asClass(BalancePGRepository).scoped(),
         calificacionRepository: asClass(CalificacionPGRepository).scoped(),
+        promocionesRepository: asClass(PromocionesPGRepository).scoped(),
+        ventasProductosLocatariosRepository: asClass(VentasProductosLocatariosPGRepository).scoped(),
         
         // Services
         adminService: asClass(AdminService).scoped(),
@@ -64,6 +70,8 @@ export default (app: express.Application): void => {
         pedidoService: asClass(PedidoService).scoped(),
         balanceService: asClass(BalanceService).scoped(),
         calificacionService: asClass(CalificacionService).scoped(),
+        promocionService: asClass(PromocionService).scoped(),
+        ventasProductosLocatariosService: asClass(VentasProductosLocatariosService).scoped(),
         
         testService: asClass(TestService).scoped(),
     });

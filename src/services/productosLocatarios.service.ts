@@ -1,6 +1,6 @@
 import { ApplicationException } from '../common/exceptions/application.exception';
 
-import { ProductosLocatariosCreateDto, ProductosLocatariosUpdateDto } from '../dtos/productos.dto';
+import { ProductosLocatariosUpdateDto } from '../dtos/productos.dto';
 
 import { ProductosLocatarios } from './repositories/domain/productos.domain';
 
@@ -15,22 +15,21 @@ export class ProductosLocatariosService{
     constructor(private readonly productosLocatariosRepository: ProductosLocatariosPGRepository,
                 private readonly productoRepository: ProductosPGRepository,
                 private readonly locatarioRepository: LocatarioPGRepository){}
-        
 
-    async store(entry: ProductosLocatariosCreateDto): Promise<ProductosLocatarios> {
-        if(!entry.producto_id) throw new ApplicationException("El producto Id es necesario");
+    // async store(entry: ProductosLocatariosCreateDto): Promise<ProductosLocatarios> {
+    //     if(!entry.producto_id) throw new ApplicationException("El producto Id es necesario");
 
-        const existeLocatario = await this.locatarioRepository.findById(entry.locatario_id);
-        if(!existeLocatario) throw new ApplicationException("No existe ese locatario");
+    //     const existeLocatario = await this.locatarioRepository.findById(entry.locatario_id);
+    //     if(!existeLocatario) throw new ApplicationException("No existe ese locatario");
         
-        const existeProductoGeneral = await this.productoRepository.findById(entry.producto_id);
-        if(!existeProductoGeneral) throw new ApplicationException("No existe el producto general con ese id");
+    //     const existeProductoGeneral = await this.productoRepository.findById(entry.producto_id);
+    //     if(!existeProductoGeneral) throw new ApplicationException("No existe el producto general con ese id");
 
-        const productoLocatario = await this.productosLocatariosRepository.store(entry);
-        if(!productoLocatario) throw new ApplicationException("Hubo un error");
-        
-        return productoLocatario as ProductosLocatarios;
-    }
+    //     const productoLocatario = await this.productosLocatariosRepository.store(entry);
+    //     if(!productoLocatario) throw new ApplicationException("Hubo un error");
+
+    //     return productoLocatario as ProductosLocatarios;
+    // }
 
 
     async update(id: number, entry: ProductosLocatariosUpdateDto): Promise<void> {
@@ -45,12 +44,14 @@ export class ProductosLocatariosService{
  
         originalEntry.producto_id = entry.producto_id || originalEntry.producto_id;
         originalEntry.locatario_id = entry.locatario_id || originalEntry.locatario_id;
-        originalEntry.unidad = entry.unidad || originalEntry.unidad;
-        originalEntry.cantidad_unidad = entry.cantidad_unidad || originalEntry.cantidad_unidad;
         originalEntry.precio = entry.precio || originalEntry.precio;
-        originalEntry.precio_rebajado = entry.precio_rebajado || originalEntry.precio_rebajado;
+
+        originalEntry.precio_rebajado = entry.precio_rebajado || 0;
+
         originalEntry.descripcion = entry.descripcion || originalEntry.descripcion;
+
         if(originalEntry.sku) originalEntry.sku = entry.sku || originalEntry.sku;
+
         originalEntry.stock = entry.stock;
         originalEntry.en_promocion = entry.en_promocion;
 
@@ -78,6 +79,24 @@ export class ProductosLocatariosService{
 
     async getByLocatarios(locatarioId: number): Promise<ProductosLocatarios[]> {
         const productos = await this.productosLocatariosRepository.getByLocatarios(locatarioId);
+        if(!productos) throw new ApplicationException("No hay productos");
+        return productos as ProductosLocatarios[];
+    }
+
+    async getByCategoriaIdLocatarioId(categoriaId: number, locatarioId: number): Promise<ProductosLocatarios[]> {
+        const productos = await this.productosLocatariosRepository.getByCategoriaIdLocatarioId(categoriaId, locatarioId);
+        if(!productos) throw new ApplicationException("No hay productos");
+        return productos as ProductosLocatarios[];
+    }
+
+    async getProductosByPlazaYEnPromocion(plazaId: number): Promise<ProductosLocatarios[]> {
+        const productos = await this.productosLocatariosRepository.getProductosByPlazaYEnPromocion(plazaId);
+        if(!productos) throw new ApplicationException("No hay productos");
+        return productos as ProductosLocatarios[];
+    }
+
+    async getProductosByLocatarioYEnPromocion(locatarioId: number): Promise<ProductosLocatarios[]> {
+        const productos = await this.productosLocatariosRepository.getProductosByLocatarioYEnPromocion(locatarioId);
         if(!productos) throw new ApplicationException("No hay productos");
         return productos as ProductosLocatarios[];
     }

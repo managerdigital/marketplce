@@ -10,72 +10,12 @@ import { PlazaRepository } from '../../plazas.repository';
 export class PlazaPGRepository implements PlazaRepository{
 
     
-    private horariosDB(horariosLlega: any): string{
- 
-        let horarios = '';
-        let c = 1;
-        for(const x in horariosLlega){
-            if(c < horariosLlega.length) {
-                horarios += '"' + horariosLlega[x] + '", ';
-            } else {
-                horarios += '"' + horariosLlega[x] + '" ';
-            }
-            c += 1;
-        }
-
-        const horariosDB = "{" + horarios + "}";
-        return horariosDB;
-    }
-
-    
-    private categoriasDB(categoriasLlega: any): string{
-        let categorias = '';
-        let contador = 1;
-        for(const x in categoriasLlega){
-            if(contador < categoriasLlega.length) {
-                categorias += '"' + categoriasLlega[x] + '", ';
-            } else {
-                categorias += '"' + categoriasLlega[x] + '" ';
-            }
-            contador += 1;
-        }
-
-        const categoriasDB = "{" + categorias + "}";
-        // console.log(categoriasDB);
-        return categoriasDB;
-    }
-    
-    
-    private telefonosDB(telefonosLllega: any): string{
-        let telefonos = '';
-        let con = 1;
-        for(const x in telefonosLllega){
-            if(con < telefonosLllega.length) {
-                telefonos += telefonosLllega[x] + ', ';
-            } else {
-                telefonos += telefonosLllega[x];
-            }
-            con += 1;
-        }
-
-        const telefonosDB = "{" + telefonos + "}";
-        return telefonosDB;
-    }
-
-    
     async store(entry: PlazaCreateDto): Promise<Plaza | null> {
         const now = new Date();
         // '{"6am - 12pm", "2pm - 6pm"}', '{"Artesanías", "Hierbas"}' '{4385964, 2342345}'
-        // const existePlaza: QueryResult = await pool.query(
-        //     "SELECT * FROM plazas where nombre = $1", 
-        //     [entry.nombre]
-        //     );
-        // if(existePlaza.rows.length){
-        //     return null;
-        // }
       
-        const horariosDB = this.horariosDB(entry.horarios);
-        const telefonosDB = this.telefonosDB(entry.telefonos);
+        // const horariosDB = this.horariosDB(entry.horarios);
+        // const telefonosDB = this.telefonosDB(entry.telefonos);
 
         const res = await pool.query(
             "INSERT INTO plazas(admin_id, localidad_id, categorias_id, nombre, direccion, telefonos, email, horarios, img, logo, created_at, updated_at) VALUES($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12) RETURNING id",
@@ -85,20 +25,15 @@ export class PlazaPGRepository implements PlazaRepository{
                 entry.categorias_id,
                 entry.nombre,
                 entry.direccion,
-                telefonosDB,
+                entry.telefonos,
                 entry.email,
-                horariosDB,
+                entry.horarios,
                 entry.img,
                 entry.logo,
                 now,
                 now
             ]
         );
-
-        // const response: QueryResult = await pool.query(
-        //     "SELECT * FROM plazas WHERE id = $1",
-        //     [res.rows[0].id]
-        //     );
 
         const plaza = await this.findById(res.rows[0].id);
         if(!plaza) return null;
@@ -117,11 +52,9 @@ export class PlazaPGRepository implements PlazaRepository{
 
         const now = new Date();
 
-        // const categoriasDB = this.categoriasDB(entry.categorias_id);
-        const horariosDB = this.horariosDB(entry.horarios);
-        const telefonosDB = this.telefonosDB(entry.telefonos);
+        // const horariosDB = this.horariosDB(entry.horarios);
         
-        // Verifico que si no viene el estado lo ponga en true y si viene ponga lo que venga
+        // Note: Verifico que si no viene el estado lo ponga en true y si viene ponga lo que venga
         let activo = true;
         if(entry.activo === false) {
             activo = entry.activo;
@@ -137,24 +70,10 @@ export class PlazaPGRepository implements PlazaRepository{
                 entry.direccion,
                 entry.img,
                 entry.logo,
-                telefonosDB,
+                entry.telefonos,
                 entry.email,
-                horariosDB,
+                entry.horarios,
                 activo,
-                now,
-                id
-            ]
-        );  
-    }
-
-    async updateCategoria(id: number, categorias: [] ): Promise<void> {
-        const now = new Date();
-        const categoriasDB = this.categoriasDB(categorias);
-
-        await pool.query(
-            "UPDATE plazas SET categorias_nombres = $1, updated_at = $2 WHERE id = $3",
-            [ 
-                categoriasDB,
                 now,
                 id
             ]
@@ -204,6 +123,16 @@ export class PlazaPGRepository implements PlazaRepository{
         const response: QueryResult = await pool.query(
             "SELECT * FROM plazas WHERE email = $1",
             [email]
+        );
+        if (response.rows.length) return response.rows[0] as Plaza;
+        return null;
+    }
+
+
+    public async findByLocalidad(localidad_id: number): Promise<Plaza | null>{
+        const response: QueryResult = await pool.query(
+            "SELECT * FROM plazas WHERE localidad_id = $1",
+            [localidad_id]
         );
         if (response.rows.length) return response.rows[0] as Plaza;
         return null;

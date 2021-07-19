@@ -34,6 +34,13 @@ export class CategoriaService {
         return categorias;
     }
 
+    
+    async getAllLimit5(): Promise<Categoria[] | null>{
+        const categorias =  await this.categoriaRepository.getAllLimit5();
+        if(!categorias)  throw new ApplicationException("No existen categorias en el sistema");
+        return categorias;
+    }
+
 
     async store(entry: CategoriaCreateDto): Promise<Categoria> {
         const existeCategoria = await this.categoriaRepository.findByName(entry.nombre);

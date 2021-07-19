@@ -2,11 +2,13 @@ import { Request, Response } from 'express';
 import { GET, PUT, POST, route } from "awilix-express";
 
 import { BaseController } from '../common/controllers/base.controller';
-import { PlazaService } from '../services/plazas.service';
+
 import { PlazaCreateDto, PlazaUpdateDto } from '../dtos/plazas.dto';
 // import { authenticate } from '../common/middlewares/authenticate';
 import { Plaza } from '../services/repositories/domain/plazas.domain';
-import { CategoriaService } from '../services/categorias.service';
+
+import { PlazaService } from '../services/plazas.service';
+import { LocalidadService } from '../services/localidad.service';
 
 
 
@@ -14,7 +16,8 @@ import { CategoriaService } from '../services/categorias.service';
 export class plazaController extends BaseController{
 
 
-    constructor(private readonly plazaService: PlazaService){
+    constructor(private readonly plazaService: PlazaService,
+                private readonly localidadService: LocalidadService){
         super();
     }
 
@@ -22,9 +25,8 @@ export class plazaController extends BaseController{
     @route('/crear')
     @POST()
     public async store(req: Request, res: Response): Promise<void>{
-
+    
         const user = req.user as {id: number, rol: string};
-
 
         if(user.rol === 'SUPER_ADMIN') {
             const { 
@@ -41,7 +43,7 @@ export class plazaController extends BaseController{
             } = req.body;
     
             try{
-
+    
                 const plaza = await this.plazaService.store({
                     admin_id,
                     localidad_id,
@@ -64,12 +66,11 @@ export class plazaController extends BaseController{
             }catch(error){
                 this.handleException(error, res);
             }
-
+    
         }
         
     }
-
-
+    
     
     @route('/categoriasPorPlazaId/:id')
     @GET()
@@ -90,8 +91,6 @@ export class plazaController extends BaseController{
         }
     }
     
-
-
     @route('/obtenerTodoCorto')
     @GET()
     public async getAllShort(req: Request, res: Response): Promise<void>{
@@ -124,9 +123,26 @@ export class plazaController extends BaseController{
         try {
             const plazas = await this.plazaService.getAll();
     
+            const plazasReturn = [];
+            for(let i = 0; i<plazas.length; i++) {
+                const localidad = await this.localidadService.findById(plazas[i].localidad_id);
+                plazasReturn.push({
+                    id: plazas[i].id,
+                    localidad: localidad.nombre,
+                    categorias_id: plazas[i].categorias_id,
+                    nombre: plazas[i].nombre,
+                    direccion: plazas[i].direccion,
+                    telefonos: plazas[i].telefonos,
+                    email: plazas[i].email,
+                    img: plazas[i].img,
+                    logo: plazas[i].logo,
+                    horarios: plazas[i].horarios
+                });
+            }
+
             res.status(200).json({
                 ok: true,
-                plazas
+                plazas: plazasReturn
             });
     
         } catch(error) {
@@ -134,6 +150,20 @@ export class plazaController extends BaseController{
         }
     }
     
+    // id: number,
+    // admin_id: number[],
+    // localidad_id: number;
+    // categorias_id: number[];
+    // nombre: string,
+    // direccion: string,
+    // telefonos: number[],
+    // email: string,
+    // img: string,
+    // logo: string,
+    // horarios: string[],
+    // activo: boolean,
+    // created_at: Date | null,
+    // updated_at: Date | null,
     
     
     @route('/buscarPorID/:id')
@@ -143,6 +173,25 @@ export class plazaController extends BaseController{
     
         try{
             const plaza = await this.plazaService.findById(id);
+    
+            res.status(200).json({
+                ok: true,
+                plaza
+            });
+    
+        } catch(error) {
+            this.handleException(error, res);
+        }
+    }
+
+
+    @route('/buscarPorLocalidad/:id')
+    @GET()
+    public async findByLocalidad(req: Request, res: Response): Promise<void>{
+        const localidad_id = parseInt(req.params.id);  
+    
+        try{
+            const plaza = await this.plazaService.findByLocalidad(localidad_id);
     
             res.status(200).json({
                 ok: true,
@@ -173,8 +222,7 @@ export class plazaController extends BaseController{
             this.handleException(error, res);
         }
     }
-   
-
+    
 
 
 
@@ -257,55 +305,6 @@ export class plazaController extends BaseController{
 
 
 
-// @route('/crear')
-// @POST()
-// public async store(req: Request, res: Response): Promise<void>{
-
-//     const user = req.user as {id: number, rol: string};
-
-
-//     if(user.rol === 'SUPER_ADMIN') {
-//         const { 
-//             admin_id, 
-//             localidad_id, 
-//             categorias_id, 
-//             nombre, 
-//             direccion, 
-//             telefonos, 
-//             email, 
-//             horarios,
-//             img,
-//             logo
-//         } = req.body;
-
-//         try{
-
-//             const plaza = await this.plazaService.store({
-//                 admin_id,
-//                 localidad_id,
-//                 categorias_id,
-//                 nombre,
-//                 direccion,
-//                 telefonos,
-//                 email,
-//                 horarios,
-//                 img,
-//                 logo
-//             } as PlazaCreateDto);
-            
-//             res.status(200).json({
-//                 ok: true,
-//                 msg: 'Plaza creada con exito',
-//                 plaza
-//             });
-                                            
-//         }catch(error){
-//             this.handleException(error, res);
-//         }
-
-//     }
-    
-// }
 
 
 
@@ -315,89 +314,3 @@ export class plazaController extends BaseController{
 
 
 
-
-
-
-
-
-// @route('/getAll')
-// @GET()
-// public async getAll(req: Request, res: Response): Promise<void>{
-
-//     try {
-//         const plazas = await this.plazaService.getAll();
-
-//         res.status(200).json({
-//             ok: true,
-//             plazas
-//         });
-
-//     } catch(error) {
-//         this.handleException(error, res);
-//     }
-// }
-
-
-// @route('/getAllMarketplace')
-// @GET()
-// public async getAllMarket(req: Request, res: Response): Promise<void>{
-
-//     try {
-//         const plazas = await this.plazaService.getAll();
-
-//         res.status(200).json({
-//             ok: true,
-//             plazas: plazas.map((plaza: Plaza) => {
-//                         return {
-//                             id: plaza.id,
-//                             nombre: plaza.nombre,
-//                             logo: plaza.logo,
-//                             img: plaza.img
-//                         };
-//                     })
-//         });
-
-//     } catch(error) {
-//         this.handleException(error, res);
-//     }
-// }
-
-
-
-// @route('/find/:id')
-// @GET()
-// public async find(req: Request, res: Response): Promise<void>{
-//     const id = parseInt(req.params.id);  
-
-//     try{
-//         const plaza = await this.plazaService.findById(id);
-
-//         res.status(200).json({
-//             ok: true,
-//             plaza
-//         });
-
-//     } catch(error) {
-//         this.handleException(error, res);
-//     }
-// }
-
-
-
-// @route('/findByName')
-// @GET()
-// public async findByName(req: Request, res: Response): Promise<void>{
-//     const {nombre} = req.body;  
-
-//     try{
-//         const plaza = await this.plazaService.findByName(nombre);
-
-//         res.status(200).json({
-//             ok: true,
-//             plaza
-//         });
-
-//     } catch(error) {
-//         this.handleException(error, res);
-//     }
-// }

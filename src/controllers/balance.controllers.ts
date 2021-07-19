@@ -1,12 +1,12 @@
 import { Request, Response } from 'express';
-import { GET, PUT, POST, route } from "awilix-express";
+import { GET, POST, route } from "awilix-express";
 
 import { BaseController } from "../common/controllers/base.controller";
 
 import { BalanceService } from '../services/balance.service';
 
 import { Balance } from '../services/repositories/domain/balance.domain';
-import { BalanceCreateDto, BalanceUpdateDto } from '../dtos/balance.dto';
+import { BalanceCreateDto } from '../dtos/balance.dto';
 
 
 @route('/balances')
@@ -94,6 +94,44 @@ export class balanceController extends BaseController{
                 ok: true,
                 balances
             });    
+        } catch(error) {
+            this.handleException(error, res); 
+        }
+    }
+
+
+    @route('/getGananciasPorLocatarioID/:id')
+    @GET()
+    public async getGananciasPorLocatarioID(req: Request, res: Response): Promise<void>{
+        try{
+            const locatarioId = parseInt(req.params.id);
+
+            const ganancias = await this.balanceService.getGananciasPorLocatarioID(locatarioId);
+    
+            res.status(200).json({
+                ok: true,
+                ganancias: ganancias.sum
+            }); 
+
+        } catch(error) {
+            this.handleException(error, res); 
+        }
+    }
+
+
+
+    @route('/getGananciasTotales')
+    @GET()
+    public async getGananciasTotales(req: Request, res: Response): Promise<void>{
+        try{
+
+            const ganancias = await this.balanceService.getGananciasTotales();
+    
+            res.status(200).json({
+                ok: true,
+                ganancias: ganancias.sum
+            }); 
+
         } catch(error) {
             this.handleException(error, res); 
         }

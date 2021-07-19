@@ -51,28 +51,28 @@ export class LocalidadPGRepository implements LocalidadRepository {
         return null;
     }
 
-    async find(id = 0, nombre = ''): Promise<Localidad | null> {
-        if(id > 0){
-            const response: QueryResult = await pool.query(
-                "SELECT * FROM localidades WHERE id = $1",
-                [id]
-            );
+    // async find(id = 0, nombre = ''): Promise<Localidad | null> {
+    //     if(id > 0){
+    //         const response: QueryResult = await pool.query(
+    //             "SELECT * FROM localidades WHERE id = $1",
+    //             [id]
+    //         );
 
-            if (response.rows.length){
-                return response.rows[0];
-            }
-            return null;
-        }
+    //         if (response.rows.length){
+    //             return response.rows[0];
+    //         }
+    //         return null;
+    //     }
 
-        const response: QueryResult = await pool.query(
-            "SELECT * FROM localidades WHERE nombre = $1",
-            [nombre]
-          );
-        if (response.rows.length){
-            return response.rows[0];
-        }
-        return null;
-    }
+    //     const response: QueryResult = await pool.query(
+    //         "SELECT * FROM localidades WHERE nombre = $1",
+    //         [nombre]
+    //       );
+    //     if (response.rows.length){
+    //         return response.rows[0];
+    //     }
+    //     return null;
+    // }
 
 
 

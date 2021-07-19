@@ -1,6 +1,5 @@
 import { Request, Response } from 'express';
 import { GET, PUT, POST, route } from "awilix-express";
-import path = require('path');
 
 import { BaseController } from '../common/controllers/base.controller';
 import { PedidoService } from '../services/pedidos.service';
@@ -154,6 +153,25 @@ export class pedidoController extends BaseController{
             console.log(locatarioId);
 
             const pedidos = await this.pedidoService.pedidosPorLocatario(locatarioId);
+
+            res.status(200).json({
+                ok: true,
+                pedidos
+            });
+        } catch(error) {
+            this.handleException(error, res);
+        }
+    }
+
+
+
+    @route('/getCantidadDePedidosPorClienteID/:id')
+    @GET()
+    public async cantidadDePedidosPorClienteID(req: Request, res: Response): Promise<void>{
+        try {
+            const clienteID = parseInt(req.params.id);
+
+            const pedidos = await this.pedidoService.cantidadDePedidosPorClienteID(clienteID);
 
             res.status(200).json({
                 ok: true,

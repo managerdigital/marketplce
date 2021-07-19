@@ -1,6 +1,5 @@
 import { Request, Response } from 'express';
 import { GET, PUT, POST, route } from "awilix-express";
-import path=require('path');
 
 import { BaseController } from "../common/controllers/base.controller";
 
@@ -88,7 +87,7 @@ export class clienteController extends BaseController{
         }
     }
 
-    @route('/find/:id')
+    @route('/buscarPorID/:id')
     @GET()
     public async getById(req: Request, res: Response): Promise<void>{
         try{
@@ -129,7 +128,7 @@ export class clienteController extends BaseController{
         }
     }
 
-    @route('/getAll')
+    @route('/obtenerTodo')
     @GET()
     public async getAll(req: Request, res: Response): Promise<void>{
 
@@ -140,23 +139,6 @@ export class clienteController extends BaseController{
                 ok: true,
                 clientes
             });
-
-        } catch(error) {
-            this.handleException(error, res);
-        }
-    }
-
-
-    
-    @route('/downladXLSX')
-    @GET()
-    public async downladXLSX(req: Request, res: Response): Promise<void>{
-
-        try {
-            await this.clienteService.generateXLSX();
-            
-            const pathXLSX = path.join(__dirname, `../../uploads/XLSX/clientes_regitrados.xlsx`);
-            res.download(pathXLSX, 'clientes_regitrados.xlsx');
 
         } catch(error) {
             this.handleException(error, res);

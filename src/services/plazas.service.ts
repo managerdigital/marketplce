@@ -1,13 +1,14 @@
 import { ApplicationException } from '../common/exceptions/application.exception';
 
 import { Plaza } from './repositories/domain/plazas.domain';
+import { Categoria } from './repositories/domain/categoria.domain';
+
 import { PlazaCreateDto, PlazaUpdateDto } from '../dtos/plazas.dto';
 
 import { AdminPGRepository } from './repositories/implementation/pg/admin.imp';
 import { LocalidadPGRepository } from './repositories/implementation/pg/localidad.imp';
 import { CategoriaPGRepository } from './repositories/implementation/pg/categoria.imp';
 import { PlazaPGRepository } from './repositories/implementation/pg/plaza.imp';
-import { Categoria } from './repositories/domain/categoria.domain';
 
 
 
@@ -16,13 +17,13 @@ export class PlazaService{
     constructor(private readonly plazaRepository: PlazaPGRepository,
                 private readonly adminRepository: AdminPGRepository,    
                 private readonly localidadRepository: LocalidadPGRepository,    
-                private readonly categoriaRepository: CategoriaPGRepository   
+                private readonly categoriaRepository: CategoriaPGRepository    
                 ) {}
 
 
     private async verificaIds(entry: PlazaCreateDto | PlazaUpdateDto): Promise<void>{
         if(entry.localidad_id){
-            const localidad = await this.localidadRepository.find(entry.localidad_id);
+            const localidad = await this.localidadRepository.findById(entry.localidad_id);
             if(!localidad) throw new ApplicationException("No encontrada esa localidad");       
         }
         
@@ -44,8 +45,7 @@ export class PlazaService{
 
     public async store(entry: PlazaCreateDto): Promise<Plaza>{
         try{
-            if (!(entry.nombre)) throw new ApplicationException("El nombre es necesario");
-
+            // if (!(entry.nombre)) throw new ApplicationException("El nombre es necesario");
             const plazaExiste = await this.plazaRepository.findByName(entry.nombre);            
             if(plazaExiste) throw new ApplicationException("Existe otra plaza con ese nombre");
             
@@ -86,6 +86,7 @@ export class PlazaService{
             originalEntry.nombre = entry.nombre || originalEntry.nombre;
             originalEntry.direccion = entry.direccion || originalEntry.direccion;
             originalEntry.telefonos = entry.telefonos || originalEntry.telefonos;
+            originalEntry.horarios = entry.horarios || originalEntry.horarios;
             originalEntry.email = entry.email || originalEntry.email;
             originalEntry.img = entry.img || originalEntry.img;
             originalEntry.logo = entry.logo || originalEntry.logo;
@@ -106,13 +107,6 @@ export class PlazaService{
     }
  
 
-
-    public async findById(id: number): Promise<Plaza>{
-        const plaza = await this.plazaRepository.findById(id);
-        if(!plaza) throw new ApplicationException("No hay plaza registradas");
-        return plaza;
-    }
-
     public async findCategoryByPlazaID(id: number): Promise<Categoria[]>{
         const plaza = await this.plazaRepository.findById(id);
         if(!plaza) throw new ApplicationException("No hay plaza registradas");
@@ -132,8 +126,23 @@ export class PlazaService{
         return categoriasReturn as Categoria[];
     }
 
+
+    public async findById(id: number): Promise<Plaza>{
+        const plaza = await this.plazaRepository.findById(id);
+        if(!plaza) throw new ApplicationException("No hay plaza registradas");
+        return plaza;
+    }
+
+
     public async findByName(name: string): Promise<Plaza>{
         const plaza = await this.plazaRepository.findByName(name);
+        if(!plaza) throw new ApplicationException("No hay plaza registradas");
+        return plaza;
+    }
+
+
+    public async findByLocalidad(localidad_id: number): Promise<Plaza>{
+        const plaza = await this.plazaRepository.findByLocalidad(localidad_id);
         if(!plaza) throw new ApplicationException("No hay plaza registradas");
         return plaza;
     }
@@ -144,10 +153,5 @@ export class PlazaService{
         if(!existe) throw new ApplicationException("No existe una plaza con ese ID");
         await this.plazaRepository.delete(id);
     }
-
-
-
-
-
     
 }

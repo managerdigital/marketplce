@@ -89,9 +89,29 @@ export class BalancePGRepository implements BalanceRepository{
 
 
     async getAll(): Promise<Balance[] | null> {
-        const response: QueryResult = await pool.query("select * from balances ORDER BY id DESC");
+        const response: QueryResult = await pool.query("SELECT * FROM balances ORDER BY id DESC");
 
         if (response.rows.length) return response.rows as Balance[];
+        return null;
+    }
+
+
+    async getGananciasPorLocatarioID(locatarioID: number): Promise<{sum: number} | null> {
+        const response: QueryResult = await pool.query(
+            "SELECT SUM(total) FROM balances GROUP BY locatorio_id = $1",
+            [locatarioID]
+            );
+
+        if (response.rows.length) return response.rows[0];
+        return null;
+    }
+
+
+    async getGananciasTotales(): Promise<{sum: number} | null> {
+        const response: QueryResult = await pool.query(
+            "SELECT SUM(total) FROM balances");
+
+        if (response.rows.length) return response.rows[0];
         return null;
     }
 

@@ -6,6 +6,7 @@ import { BaseController } from "../common/controllers/base.controller";
 import { AdminService } from '../services/admin.service';
 
 import { AdminCreateDto, AdminUpdateDto } from '../dtos/admin.dto';
+import { AdminController } from '../services/repositories/domain/admin.domain';
 
 // SUPER_ADMIN, ADMIN_LOCATARIO, LOCATARIO
 @route('/admins')
@@ -20,7 +21,7 @@ export class adminController extends BaseController{
     public async getById(req: Request, res: Response): Promise<void>{
         try{
             const id = parseInt(req.params.id);
-            const admin = await this.adminService.findById(id);
+            const admin = await this.adminService.findById(id) as AdminController;
             
             delete admin.password;
             delete admin.token_reset;
@@ -142,7 +143,7 @@ export class adminController extends BaseController{
                 password,
                 img,
                 rol 
-            } as AdminCreateDto);
+            } as AdminCreateDto) as AdminController;
             
             delete admin.password;
             delete admin.token_reset;

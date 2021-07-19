@@ -32,36 +32,51 @@ export class BalanceService {
 
     async findById(id: number): Promise<Balance> {
         const balance = await this.balanceRepository.findById(id);
-        if(!balance) throw new ApplicationException("Ya existe esa categoria");
+        if(!balance) throw new ApplicationException("Ya existe esa balance");
         return balance as Balance;
     }
 
 
     async findByPlazaId(id: number): Promise<Balance> {
         const balance = await this.balanceRepository.findByPlazaId(id);
-        if(!balance) throw new ApplicationException("Ya existe esa categoria");
+        if(!balance) throw new ApplicationException("Ya existe esa balance");
         return balance as Balance;
     }
 
 
     async findByLocatarioId(id: number): Promise<Balance> {
         const balance = await this.balanceRepository.findByLocatarioId(id);
-        if(!balance) throw new ApplicationException("Ya existe esa categoria");
+        if(!balance) throw new ApplicationException("Ya existe esa balance");
         return balance as Balance;
     }
 
     
     async findByClienteId(id: number): Promise<Balance> {
         const balance = await this.balanceRepository.findByClienteId(id);
-        if(!balance) throw new ApplicationException("Ya existe esa categoria");
+        if(!balance) throw new ApplicationException("Ya existe esa balance");
         return balance as Balance;
     }
 
 
     async getAll(): Promise<Balance[]> {
         const balance = await this.balanceRepository.getAll();
-        if(!balance) throw new ApplicationException("No existe esa categoria");
+        if(!balance) throw new ApplicationException("No existe balances");
         return balance as Balance[];
+    }
+
+
+    async getGananciasPorLocatarioID(locatarioID: number): Promise<{sum: number}> {
+        const ganancia = await this.balanceRepository.getGananciasPorLocatarioID(locatarioID);
+        if(!ganancia) throw new ApplicationException("No existe ganacias para ese locatario");
+        return ganancia;
+    }
+
+
+
+    async getGananciasTotales(): Promise<{sum: number}> {
+        const ganancia = await this.balanceRepository.getGananciasTotales();
+        if(!ganancia) throw new ApplicationException("No existe ganacias para ese locatario");
+        return ganancia;
     }
 
 }

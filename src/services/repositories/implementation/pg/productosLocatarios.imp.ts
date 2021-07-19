@@ -4,37 +4,33 @@ import { QueryResult } from 'pg';
 import { ProductosLocatarios } from '../../domain/productos.domain';
 
 import { ProductosLocatariosRepository } from '../../productosLocatarios.repository';
-import { ProductosLocatariosCreateDto, ProductosLocatariosUpdateDto } from '../../../../dtos/productos.dto';
-
 
 
 export class ProductosLocatariosPGRepository implements ProductosLocatariosRepository {
 
 
-    async store(entry: ProductosLocatariosCreateDto): Promise<ProductosLocatarios | null> {
-        const now = new Date();
+    // async store(entry: ProductosLocatariosStore): Promise<ProductosLocatarios | null> {
+        // const now = new Date();
 
-        const res = await pool.query(
-             "INSERT INTO productos_locatarios(producto_id, locatario_id, stock, en_promocion, unidad, cantidad_unidad, precio, precio_rebajado, descripcion, sku, created_at, updated_at) VALUES($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12)  RETURNING id",
-             [
-                entry.producto_id,
-                entry.locatario_id, 
-                entry.stock,
-                entry.en_promocion, 
-                entry.unidad, 
-                entry.cantidad_unidad,
-                entry.precio,
-                entry.precio_rebajado,
-                entry.descripcion, 
-                entry.sku, 
-                now, 
-                now
-            ]
-         );
+        // const res = await pool.query(
+        //      "INSERT INTO productos_locatarios(producto_id, locatario_id, stock, en_promocion, precio, precio_rebajado, descripcion, sku, created_at, updated_at) VALUES($1, $2, $3, $4, $5, $6, $7, $8, $9, $10)  RETURNING id",
+        //      [
+        //         entry.producto_id,
+        //         entry.locatario_id, 
+        //         entry.stock,
+        //         entry.en_promocion, 
+        //         entry.precio,
+        //         entry.precio_rebajado,
+        //         entry.descripcion, 
+        //         entry.sku, 
+        //         now, 
+        //         now
+        //     ]
+        //  );
 
-        const producto = await this.findById(res.rows[0].id);
-        return producto as ProductosLocatarios;
-    }
+        // const producto = await this.findById(res.rows[0].id);
+        // return producto as ProductosLocatarios;
+    // }
 
 
 
@@ -42,12 +38,10 @@ export class ProductosLocatariosPGRepository implements ProductosLocatariosRepos
         const now = new Date();
 
         await pool.query(
-            "UPDATE productos_locatarios SET producto_id = $1, stock = $2, en_promocion = $3, unidad = $4, cantidad_unidad = $5, precio = $6, precio_rebajado = $7, descripcion = $8, sku =$9, locatario_id = $10, updated_at = $11 WHERE id = $12",
+            "UPDATE productos_locatarios SET producto_id = $1, stock = $2, en_promocion = $3, precio = $4, precio_rebajado = $5, descripcion = $6, sku =$7, locatario_id = $8, updated_at = $9 WHERE id = $10",
             [   entry.producto_id, 
                 entry.stock,
                 entry.en_promocion, 
-                entry.unidad, 
-                entry.cantidad_unidad,
                 entry.precio,
                 entry.precio_rebajado,
                 entry.descripcion, 
@@ -96,8 +90,52 @@ export class ProductosLocatariosPGRepository implements ProductosLocatariosRepos
     }
 
     async getByLocatarios(locatarioId: number): Promise<ProductosLocatarios[] | null> {
-        const response: QueryResult = await pool.query("SELECT * FROM productos_locatarios WHERE locatario_id = $1",
-        [locatarioId]);
+        const response: QueryResult = await pool.query(
+            "SELECT * FROM productos_locatarios WHERE locatario_id = $1",
+            [locatarioId]
+        );
+
+        if (response.rows.length) return response.rows as ProductosLocatarios[];
+        return null;
+    }
+
+
+    async getByCategoriaIdLocatarioId(categoriaId: number, locatarioId: number): Promise<ProductosLocatarios[] | null> {
+        const response: QueryResult = await pool.query(
+            "SELECT * FROM productos_locatarios L, productos P WHERE L.locatario_id = $1 AND $2 = ANY (P.categorias_id)",
+            [locatarioId, categoriaId]
+        );
+
+        if (response.rows.length) return response.rows as ProductosLocatarios[];
+        return null;
+    }
+
+    async getByProductoIdYPlazaId( plazaId: number, productoId: number, locatarioId: number): Promise<ProductosLocatarios[] | null> {
+        const response: QueryResult = await pool.query(
+            "SELECT * FROM productos_locatarios WHERE plaza_id = $1 AND producto_id = $2 AND locatario_id = $3",
+            [plazaId, productoId, locatarioId]
+        );
+
+        if (response.rows.length) return response.rows as ProductosLocatarios[];
+        return null;
+    }
+
+    async getProductosByPlazaYEnPromocion(plazaId: number): Promise<ProductosLocatarios[] | null> {
+        const response: QueryResult = await pool.query(
+            "select * from productos_locatarios where en_promocion = true AND plaza_id = $1 AND stock = true AND activo = true",
+            [plazaId]
+        );
+
+        if (response.rows.length) return response.rows as ProductosLocatarios[];
+        return null;
+    }
+
+
+    async getProductosByLocatarioYEnPromocion(locatarioId: number): Promise<ProductosLocatarios[] | null> {
+        const response: QueryResult = await pool.query(
+            "select * from productos_locatarios where locatario_id = $1 AND en_promocion = true AND activo = true AND stock = true",
+            [locatarioId]
+        );
 
         if (response.rows.length) return response.rows as ProductosLocatarios[];
         return null;

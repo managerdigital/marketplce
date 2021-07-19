@@ -53,13 +53,17 @@ export class CategoriaPGRepository implements CategoriaRepository{
 
 
    async getAllCategorias(): Promise<Categoria[] | null> {
-       const response: QueryResult = await pool.query("select * from categorias ORDER BY id DESC");
-       if (response.rows.length){
-           // console.log(response.rows);
-           return response.rows;
-       }
-       return null;
+        const response: QueryResult = await pool.query("SELECT * FROM categorias ORDER BY id DESC");
+        if (!response.rows.length) return null;
+        return response.rows;
    }
+
+
+   async getAllLimit5(): Promise<Categoria[] | null> {
+    const response: QueryResult = await pool.query("SELECT * FROM categorias ORDER BY id DESC LIMIT 5");
+    if (!response.rows.length) return null;
+    return response.rows;
+}
 
 
    async findById(id: number): Promise<Categoria | null> {
@@ -81,30 +85,6 @@ export class CategoriaPGRepository implements CategoriaRepository{
         return null;
    }
 
-
-    // async findCategoria(id: number, nombre = ''): Promise<Categoria | null> {
-        
-    //     if(!nombre){
-    //         const response: QueryResult = await pool.query(
-    //                         "SELECT * FROM categorias WHERE id = $1",
-    //                         [id]
-    //                     );
-    //                     if (response.rows.length){
-    //                         return response.rows[0];
-    //                     }
-    //                     return null;
-    //     }
-
-    //     const response: QueryResult = await pool.query(
-    //                     "SELECT * FROM categorias WHERE nombre = $1",
-    //                     [nombre]
-    //                 );
-    //                 if (response.rows.length){
-    //                     return response.rows[0];
-    //                 }
-    //                 return null;
-    // }
-   
     
     async delete(id: number): Promise<void> {
         const now = new Date();

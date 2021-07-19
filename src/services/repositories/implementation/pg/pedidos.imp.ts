@@ -99,4 +99,14 @@ export class PedidoPGRepository implements PedidoRepository {
         if (response.rows.length) return response.rows as Pedido[];
         return null;
     }
+
+
+    async cantidadDePedidosPorClienteID(clienteId: number): Promise<number | null>  {
+        const response: QueryResult = await pool.query(
+            "SELECT COUNT(cliente_id) FROM pedidos WHERE cliente_id = $1 GROUP BY cliente_id ",
+            [clienteId]
+        );
+        if (response.rows.length) return response.rows[0];
+        return null;
+    }
 }

@@ -8,5 +8,6 @@ export interface ProductoRepository {
     delete(id: number): Promise<void>;
     findByName(nombre: string): Promise<Productos | null>;
     findById(id: number): Promise<Productos | null>
+    // findByNameAndUnit(name: string, unit: string): Promise<Productos | null>
     getAll(): Promise<Productos[] | null>;
 }

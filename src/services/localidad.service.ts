@@ -10,10 +10,8 @@ export class LocalidadService {
 
 
     async find(id: number, nombre = ''): Promise<Localidad | null>{
-
-        if(nombre) return await this.localidadRepository.find(0, nombre);
-           
-        return await this.localidadRepository.find(id);
+        if(nombre) return await this.localidadRepository.findByName(nombre);
+        return await this.localidadRepository.findById(id);
     }
 
     async findById(id: number): Promise<Localidad>{

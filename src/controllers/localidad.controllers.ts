@@ -47,7 +47,7 @@ export class localidadController extends BaseController{
     }
 
 
-    @route('/getAll')
+    @route('/obtenerTodo')
     @GET()
     public async getAll(req: Request, res: Response): Promise<void>{
 
@@ -56,19 +56,16 @@ export class localidadController extends BaseController{
 
             if(localidades){
                 
-                // const localidadesReturn = localidades.map((localidad: Localidad) => {
-                //     return {
-                //         id: localidad.id,
-                //         nombre: localidad.nombre
-                //     };
-                // });
+                const localidadesReturn = localidades.map((localidad: Localidad) => {
+                    return {
+                        id: localidad.id,
+                        nombre: localidad.nombre
+                    };
+                });
                 
-                // console.log(localidadesReturn);
-                
-                // res.setHeader("Content-Type", "application/json; charset=utf-8");
                 res.status(200).json({
                     ok: true,
-                    localidades
+                    localidades: localidadesReturn
                 });
                 return;
             }
@@ -87,7 +84,7 @@ export class localidadController extends BaseController{
 
 
 
-    @route('/getLocalidad/:id')
+    @route('/buscarPorID/:id')
     @GET()
     public async getById(req: Request, res: Response): Promise<void>{
         res.setHeader('Content-Type', 'application/json; charset=utf-8');

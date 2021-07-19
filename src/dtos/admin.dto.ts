@@ -17,7 +17,7 @@ interface AdminCreateDto {
     telefono?: number;
     cedula?: number;
     rol?: string;
-    img?: string | null
+    img?: string
 }
 
 export {

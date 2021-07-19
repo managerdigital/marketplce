@@ -21,7 +21,7 @@ export class AdminService {
       if(!admins) throw new ApplicationException("No hay admins registrados");
 
       return admins.map((admin: Admin) => {
-        delete admin.password;
+        admin.password = '';
         return admin;
       });
     }
@@ -42,7 +42,7 @@ export class AdminService {
             
         await this.adminRepository.update(originalEntry);
       }catch(error){
-        throw new ApplicationException(error);
+        throw new ApplicationException("Hubo un error" + error);
       }
     }
 
@@ -53,7 +53,7 @@ export class AdminService {
         if(!admin) throw new ApplicationException("No existe un admin con ese id");
         return admin;
       } catch(error){
-        throw new ApplicationException(error);
+        throw new ApplicationException("Hubo un error" + error);
       }
     }
 
@@ -64,7 +64,7 @@ export class AdminService {
         if(!admin) throw new ApplicationException("No existe un admin con esa cedula");
         return admin;
       } catch(error){
-        throw new ApplicationException(error);
+        throw new ApplicationException("Hubo un error" + error);
       }
     }
 
@@ -94,7 +94,7 @@ export class AdminService {
         // admin.password = bcrypt.hashSync(newPassword, salt);
         await this.adminRepository.changePassword(admin);
       } catch (error) {
-        throw new ApplicationException(error);
+        throw new ApplicationException("Hubo un error" + error);
       }      
     }
 
@@ -151,7 +151,7 @@ export class AdminService {
         return adminReturn;
 
       } catch (error) {
-        throw new ApplicationException(error);
+        throw new ApplicationException("Hubo un error" + error);
       }
     }
 
@@ -178,7 +178,7 @@ export class AdminService {
                 rol: admin.rol
               },
               secretKey,
-              { expiresIn: "7h", algorithm: "HS256" }
+              { expiresIn: "3h", algorithm: "HS256" }
         );  
       
       } catch(error) {

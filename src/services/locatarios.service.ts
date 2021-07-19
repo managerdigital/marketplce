@@ -96,10 +96,10 @@ export class LocatarioService{
             }
 
 
-            if(entry.cedula){
-                const existeLocatarioCedula = await this.locatarioRepository.findByCedula(entry.cedula);  
-                if(existeLocatarioCedula) throw new ApplicationException("Ya existe un local con esa cédula");
-            }
+            // if(entry.cedula){
+            //     const existeLocatarioCedula = await this.locatarioRepository.findByCedula(entry.cedula);  
+            //     if(existeLocatarioCedula) throw new ApplicationException("Ya existe un local con esa cédula");
+            // }
             
             const locatario = await this.locatarioRepository.store({
                admin_id: entry.admin_id,
@@ -131,7 +131,7 @@ export class LocatarioService{
         try{
             const originalEntry = await this.locatarioRepository.findById(id);
 
-            if(!originalEntry) throw new ApplicationException("No existe una plaza con ese ID");
+            if(!originalEntry) throw new ApplicationException("No existe una locatario con ese ID");
 
             if(entry.plaza_id) {
                 const plaza = await this.plazaRepository.findById(entry.plaza_id);
@@ -174,8 +174,6 @@ export class LocatarioService{
     }
 
 
-
-
     async findById(id: number): Promise<Locatario> {
         const locatario = await this.locatarioRepository.findById(id);
         if(!locatario) throw new ApplicationException("No existe ese locatario");
@@ -183,9 +181,8 @@ export class LocatarioService{
     }
 
 
-
-    async findByCedula(cedula: number): Promise<Locatario> {
-        const locatario = await this.locatarioRepository.findByCedula(cedula);
+    async findByCedula(cedula: number): Promise<Locatario[]> {
+        const locatario = await this.locatarioRepository.findByCedula(cedula) as Locatario[];
         if(!locatario) throw new ApplicationException("No existe ese locatario");
         return locatario;
     }
@@ -399,6 +396,7 @@ export class LocatarioService{
     }
 
 
+    
     private async verificaTelefono(telefono: any): Promise<[]>{
         if(typeof telefono === 'string' || telefono instanceof String){
             telefono = await this.str2Num(telefono.split('-'));
@@ -418,16 +416,18 @@ export class LocatarioService{
         });
         return returnArr;
     }
-    
-    
-    
-    // private async capitalize(word: string): Promise<any>{
-    //     if(word){
-    //         return await word[0].toUpperCase() + word.slice(1).toLowerCase();
-    //     } 
-    // }
-    
 
+
+    async getLocatariosPorPlazaYCategoria(plazaId: number, categoriaId: number): Promise<Locatario[] >{
+        const plazaExiste = await this.plazaRepository.findById(plazaId);
+        if(!plazaExiste) throw new ApplicationException("No existe una plaza con ese ID");
+        
+        const locatarios = await this.locatarioRepository.getLocatariosPorPlazaYCategoria(plazaId, categoriaId);
+        if(!locatarios) throw new ApplicationException("No existen locatarios");
+        return locatarios;
+    }
+
+    
     async getLocatariosPorPlaza(plazaId: number): Promise<Locatario[] >{
         const plazaExiste = await this.plazaRepository.findById(plazaId);
         if(!plazaExiste) throw new ApplicationException("No existe una plaza con ese ID");
@@ -437,8 +437,16 @@ export class LocatarioService{
         return locatarios;
     }
 
+    async getquinceLocatariosPorPlaza(plazaId: number): Promise<Locatario[] >{
+        const plazaExiste = await this.plazaRepository.findById(plazaId);
+        if(!plazaExiste) throw new ApplicationException("No existe una plaza con ese ID");
+        
+        const locatarios = await this.locatarioRepository.getquinceLocatariosPorPlaza(plazaId);
+        if(!locatarios) throw new ApplicationException("No existen locatarios");
+        return locatarios;
+    }
 
-
+    
     async getLocatariosPorPlazaPaginado(plazaId: number, hasta: number, desde: number): Promise<Locatario[] >{
         const plazaExiste = await this.plazaRepository.findById(plazaId);
         if(!plazaExiste) throw new ApplicationException("No existe una plaza con ese ID");
@@ -447,8 +455,5 @@ export class LocatarioService{
         if(!locatarios) throw new ApplicationException("No existen locatarios");
         return locatarios;
     }
-
-
-    
 
 }

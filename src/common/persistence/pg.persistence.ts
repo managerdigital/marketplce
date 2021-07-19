@@ -6,5 +6,5 @@ export const pool = new Pool({
         password: process.env.db_postgres_password,
         database: process.env.db_postgres_database,
         port: process.env.db_postgres_port,
-        ssl: true
+        // ssl: true
     } as unknown as ConnectionConfig);

@@ -10,9 +10,8 @@ export interface LocatarioRepository {
     // find(id: number, buscarPor: string): Promise<Locatario | null>;
     findById(id: number): Promise<Locatario | null>;
     findByEmail(email:string): Promise<Locatario | null>;
-    findByCedula(cedula: number): Promise<Locatario | null>;
+    findByCedula(cedula: number): Promise<Locatario[] | null>;
     findPorNumeroLocalPlazaId(noLocal: number, plazaId: number): Promise<Locatario | null>;
     getAll(offset: number): Promise<Locatario[] | null>;
     getTotalLocatariosDePlaza():Promise<[] | null>;
-
 }

@@ -1,5 +1,5 @@
 import { Request, Response } from 'express';
-import { GET, PUT, POST, route } from "awilix-express";
+import { GET, POST, route } from "awilix-express";
 
 import { BaseController } from '../common/controllers/base.controller';
 import { CalificacionService } from '../services/calificacion.service';

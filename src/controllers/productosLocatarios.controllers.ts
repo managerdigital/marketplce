@@ -1,132 +1,23 @@
 import { Request, Response } from 'express';
-import { route, POST, PUT, GET } from 'awilix-express';
+import { route, GET } from 'awilix-express';
 
 import { BaseController } from '../common/controllers/base.controller';
 
 import { ProductosLocatariosService } from '../services/productosLocatarios.service';
 import { ProductoService } from '../services/productos.service';
 
-import { ProductosLocatariosCreateDto, ProductosLocatariosUpdateDto } from '../dtos/productos.dto';
 import { Productos } from '../services/repositories/domain/productos.domain';
+import { CategoriaService } from '../services/categorias.service';
 
 @route('/productosLocatarios')
 export class productoLocatariosController extends BaseController{
 
 
     constructor(private readonly productosLocatariosService: ProductosLocatariosService,
-                private readonly productoService: ProductoService){
+                private readonly productoService: ProductoService,
+                private readonly categoriaService: CategoriaService){
         super();
     }
-
-    @route('/crear')
-    @POST()
-    public async store(req: Request, res: Response): Promise<void>{
-        
-        const { 
-                producto_id, 
-                locatario_id,
-                precio, 
-                precio_rebajado, 
-                unidad, 
-                cantidad_unidad, 
-                descripcion, 
-                sku,
-                en_promocion,
-                stock
-            } = req.body;
-
-
-        try{
-            const producto = await this.productosLocatariosService.store({
-                producto_id,
-                locatario_id,
-                precio,
-                precio_rebajado,
-                unidad,
-                cantidad_unidad,
-                descripcion,
-                sku,
-                en_promocion,
-                stock
-            } as ProductosLocatariosCreateDto);
-
-            res.status(200).json({
-                ok: true,
-                msg: 'Producto creado con exito',
-                producto
-            });
-
-        } catch(error) {
-            this.handleException(error, res);
-        }
-    }
-
-
-    @route('/update/:id')
-    @PUT()
-    public async update(req: Request, res: Response): Promise<void>{
-        const id = parseInt(req.params.id);  
-
-        const { 
-            producto_id,
-            locatario_id, 
-            precio, 
-            precio_rebajado, 
-            unidad, 
-            cantidad_unidad, 
-            descripcion, 
-            sku,
-            en_promocion,
-            stock
-        } = req.body;
-        
-        try {
-            await this.productosLocatariosService.update(id, {
-                producto_id,
-                locatario_id,
-                precio,
-                precio_rebajado,
-                unidad,
-                cantidad_unidad,
-                descripcion,
-                sku,
-                en_promocion,
-                stock
-            } as ProductosLocatariosUpdateDto);
-
-            res.status(200).json({
-                ok: true,
-                msg: "Producto actualizado con exito!"
-            });
-            
-        } catch(error){
-            this.handleException(error, res);
-        }
-        
-    }
-
-
-
-    
-    @route('/delete/:id')
-    @PUT()
-    public async delete(req: Request, res: Response): Promise<void>{
-        const id = parseInt(req.params.id);
-            
-        try {
-            await this.productosLocatariosService.delete(id);
-            
-            res.status(200).json({
-                ok: true,
-                msg: "Producto borrado con exito!"
-            });
-
-        } catch(error){
-            this.handleException(error, res);
-        }
-    }
-
-
 
     @route('/buscaPorID/:id')
     @GET()
@@ -135,10 +26,36 @@ export class productoLocatariosController extends BaseController{
 
         try{
             const producto = await this.productosLocatariosService.findById(id);
+            
+            const productoGeneral = await this.productoService.findById(producto.producto_id);
+
+            const arrayCategorias = productoGeneral.categorias_id;
+            const categoriasReturn = [];
+            for(let i = 0; i<arrayCategorias.length; i++){
+                const categoria = await this.categoriaService.findById(arrayCategorias[i]);
+                categoriasReturn.push(categoria.nombre);
+            }
+
+            delete producto.updated_at;
+            delete producto.created_at;
+            delete producto.descripcion;
 
             res.status(200).json({
                 ok: true,
-                producto
+                producto: {
+                    ...producto,
+                    nombre: productoGeneral.nombre,
+                    sku: productoGeneral.sku,
+                    imagen_principal: productoGeneral.imagen_principal,
+                    imagenes: [
+                        productoGeneral.imagen_1,
+                        productoGeneral.imagen_2
+                    ]
+                },
+                categorias: categoriasReturn,
+                visitas: this.getRandomArbitrary(1, 100),
+                calificacion: this.getRandomArbitrary(3.5, 10),
+                vendidos: this.getRandomArbitrary(0, 20)
             });
 
         } catch(error) {
@@ -147,6 +64,9 @@ export class productoLocatariosController extends BaseController{
     }
 
 
+    private getRandomArbitrary(min: number, max: number): number {
+        return Math.random() * (max - min) + min;
+    }
 
        
     @route('/obtenerTodo')
@@ -176,9 +96,74 @@ export class productoLocatariosController extends BaseController{
 
             const productos = await this.productosLocatariosService.getByLocatarios(locatario_id);
 
+            const productosReturn = [];
+            for(let i = 0; i<productos.length; i++){
+                const productoGeneral = await this.productoService.findById(productos[i].producto_id);
+                
+                delete productos[i].sku;
+                delete productos[i].descripcion;
+                delete productos[i].created_at;
+                delete productos[i].updated_at;
+                
+                productosReturn.push({
+                    ...productos[i],
+                    nombre: productoGeneral.nombre,
+                    imagen_principal: productoGeneral.imagen_principal,
+                    imagenes: [
+                        productoGeneral.imagen_1,
+                        productoGeneral.imagen_2
+                    ],
+                    unidad: productoGeneral.unidad
+                })
+            }
+
             res.status(200).json({
                 ok: true,
-                productos
+                productos: productosReturn
+            });
+
+        } catch(error) {
+            this.handleException(error, res);
+        }
+    }
+
+
+    @route('/obtenerPorCategoriaIdLocatarioId/:categoriaId/:locatarioId')
+    @GET()
+    public async getByCategoriaIdYPlazaId(req: Request, res: Response): Promise<void>{
+
+        try {
+            const categoriaId = parseInt(req.params.categoriaId);  
+            // const plazaId = parseInt(req.params.plazaId);  
+            const locatarioId = parseInt(req.params.locatarioId);  
+
+            const productos = await this.productosLocatariosService.getByCategoriaIdLocatarioId(categoriaId, locatarioId);
+
+            const productosReturn = [];
+            for(let i = 0; i<productos.length; i++){
+                const productoGeneral = await this.productoService.findById(productos[i].producto_id);
+                
+                productosReturn.push({
+                    id: productos[i].id,
+                    producto_id: productos[i].producto_id,
+                    stock: productos[i].stock,
+                    en_promocion: productos[i].en_promocion,
+                    precio: productos[i].precio,
+                    precio_rebajado: productos[i].precio_rebajado,
+                    nombre: productoGeneral.nombre,
+                    imagen_principal: productoGeneral.imagen_principal,
+                    imagenes: [
+                        productoGeneral.imagen_1,
+                        productoGeneral.imagen_2
+                    ],
+                    unidad: productoGeneral.unidad,
+                    sku: productoGeneral.sku
+                })
+            }
+
+            res.status(200).json({
+                ok: true,
+                productos: productosReturn
             });
 
         } catch(error) {
@@ -220,6 +205,88 @@ export class productoLocatariosController extends BaseController{
         }
     }
 
+
+    @route('/obtenerPorPlazaIdEnPromocion/:plaza_id')
+    @GET()
+    public async getProductosByPlazaYEnPromocion(req: Request, res: Response): Promise<void>{
+
+        try {
+            const plaza_id = parseInt(req.params.plaza_id);  
+
+            const productos = await this.productosLocatariosService.getProductosByPlazaYEnPromocion(plaza_id);
+
+            const productosReturn = [];
+            for(let i = 0; i<productos.length; i++){
+                const productoGeneral = await this.productoService.findById(productos[i].producto_id);
+                
+                delete productos[i].sku;
+                delete productos[i].descripcion;
+                delete productos[i].created_at;
+                delete productos[i].updated_at;
+                
+                productosReturn.push({
+                    ...productos[i],
+                    nombre: productoGeneral.nombre,
+                    imagen_principal: productoGeneral.imagen_principal,
+                    imagenes: [
+                        productoGeneral.imagen_1,
+                        productoGeneral.imagen_2
+                    ],
+                    unidad: productoGeneral.unidad
+                })
+            }
+
+            res.status(200).json({
+                ok: true,
+                productos: productosReturn
+            });
+
+        } catch(error) {
+            this.handleException(error, res);
+        }
+    }
+
+
+    @route('/obtenerPorLocataridIdEnPromocion/:id')
+    @GET()
+    public async getProductosByLocatarioIdEnPromocion(req: Request, res: Response): Promise<void>{
+
+        try {
+            const locatarioId = parseInt(req.params.id);  
+
+            const productos = await this.productosLocatariosService.getProductosByLocatarioYEnPromocion(locatarioId);
+
+            const productosReturn = [];
+            for(let i = 0; i<productos.length; i++){
+                const productoGeneral = await this.productoService.findById(productos[i].producto_id);
+                
+                delete productos[i].sku;
+                delete productos[i].descripcion;
+                delete productos[i].created_at;
+                delete productos[i].updated_at;
+                // delete productos[i];
+                
+                productosReturn.push({
+                    ...productos[i],
+                    nombre: productoGeneral.nombre,
+                    imagen_principal: productoGeneral.imagen_principal,
+                    imagenes: [
+                        productoGeneral.imagen_1,
+                        productoGeneral.imagen_2
+                    ],
+                    unidad: productoGeneral.unidad
+                })
+            }
+
+            res.status(200).json({
+                ok: true,
+                productos: productosReturn
+            });
+
+        } catch(error) {
+            this.handleException(error, res);
+        }
+    }
 
     
     

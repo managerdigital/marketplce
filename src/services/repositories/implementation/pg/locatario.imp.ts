@@ -11,54 +11,21 @@ import { LocatarioCreateDto, LocatarioUpdateDto } from '../../../../dtos/locatar
 
 export class LocatarioPGRepository implements LocatarioRepository {
 
-    private horariosDB(horariosLlega: any): string{
+    // private horariosDB(horariosLlega: any): string{
  
-        let horarios = '';
-        let c = 1;
-        for(const x in horariosLlega){
-            if(c < horariosLlega.length) {
-                horarios += '"' + horariosLlega[x] + '", ';
-            } else {
-                horarios += '"' + horariosLlega[x] + '" ';
-            }
-            c += 1;
-        }
-
-        const horariosDB = "{" + horarios + "}";
-        return horariosDB;
-    }
-
-    // private categoriasDB(categoriasLlega: any): string{
-    //     let categorias = '';
-    //     let contador = 1;
-    //     for(const x in categoriasLlega){
-    //         if(contador < categoriasLlega.length) {
-    //             categorias += '"' + categoriasLlega[x] + '", ';
+    //     let horarios = '';
+    //     let c = 1;
+    //     for(const x in horariosLlega){
+    //         if(c < horariosLlega.length) {
+    //             horarios += '"' + horariosLlega[x] + '", ';
     //         } else {
-    //             categorias += '"' + categoriasLlega[x] + '" ';
+    //             horarios += '"' + horariosLlega[x] + '" ';
     //         }
-    //         contador += 1;
+    //         c += 1;
     //     }
 
-    //     const categoriasDB = "{" + categorias + "}";
-    //     // console.log(categoriasDB);
-    //     return categoriasDB;
-    // }
-    
-    // private numeroLocal(numeroLllega: any): string{
-    //     let admins = '';
-    //     let con = 1;
-    //     for(const x in numeroLllega){
-    //         if(con < numeroLllega.length) {
-    //             admins += numeroLllega[x] + ', ';
-    //         } else {
-    //             admins += numeroLllega[x];
-    //         }
-    //         con += 1;
-    //     }
-
-    //     const adminsDB = "{" + admins + "}";
-    //     return adminsDB;
+    //     const horariosDB = "{" + horarios + "}";
+    //     return horariosDB;
     // }
 
     async store(entry: LocatarioCreateDto): Promise<Locatario | null> {
@@ -67,7 +34,7 @@ export class LocatarioPGRepository implements LocatarioRepository {
         // '{"6am - 12pm", "2pm - 6pm"}', '{"Artesanías", "Hierbas"}' '{4385964, 2342345}'
         // INSERT INTO locatarios(admin_id, plaza_id, categorias, nombre, horarios) VALUES(1, 2, '{"Ropa", "Mascotas"}', 'Locatario Nombre', '{"6am - 12pm", "2pm - 6pm"}');
         // const categoriasDB = this.categoriasDB(entry.categorias);
-        const horariosDB = this.horariosDB(entry.horarios);
+        // const horariosDB = this.horariosDB(entry.horarios);
 
         const res = await pool.query(
             "INSERT INTO locatarios(admin_id, plaza_id, categorias_id, numero_local, productos_locatarios_id, nombre_local, nombre, apellido, cedula, email, img, logo, telefonos, horarios, created_at, updated_at) VALUES($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13, $14, $15, $16)  RETURNING id",
@@ -85,7 +52,7 @@ export class LocatarioPGRepository implements LocatarioRepository {
                 entry.img,
                 entry.logo,
                 entry.telefonos,
-                horariosDB,
+                entry.horarios,
                 now,
                 now
             ]
@@ -104,7 +71,7 @@ export class LocatarioPGRepository implements LocatarioRepository {
         const now = new Date();
 
         // const categoriasDB = this.categoriasDB(entry.categorias);
-        const horariosDB = this.horariosDB(entry.horarios);
+        // const horariosDB = this.horariosDB(entry.horarios);
         // console.log(entry.activo);
         // const activo = !entry.activo ? entry.activo: true;
         let activo = true;
@@ -129,7 +96,7 @@ export class LocatarioPGRepository implements LocatarioRepository {
                 entry.img,
                 entry.logo,
                 entry.telefonos,
-                horariosDB,
+                entry.horarios,
                 activo,
                 now,
                 id
@@ -158,12 +125,12 @@ export class LocatarioPGRepository implements LocatarioRepository {
     }
 
 
-    async findByCedula(cedula: number): Promise<Locatario | null> {
+    async findByCedula(cedula: number): Promise<Locatario[] | null> {
         const response: QueryResult = await pool.query(
             "SELECT * FROM locatarios WHERE cedula = $1",
             [cedula]
             );
-            if (response.rows.length) return response.rows[0] as Locatario;
+            if (response.rows.length) return response.rows as Locatario[];
             return null;
     }
 
@@ -220,6 +187,21 @@ export class LocatarioPGRepository implements LocatarioRepository {
     }
         
 
+    public async getLocatariosPorPlazaYCategoria(plazaId: number, categoriaId: number): Promise<Locatario[] | null>{
+        
+        const response: QueryResult = await pool.query(
+            "SELECT * FROM locatarios WHERE plaza_id = $1 AND $2 = ANY (categorias_id) ORDER BY updated_at DESC;", 
+            [
+            plazaId,
+            categoriaId
+            ]
+        );
+
+        if (response.rows.length) return response.rows as Locatario[];
+        return null;
+    }
+
+    
     public async getLocatariosPorPlaza(plaza_id: number): Promise<Locatario[] | null>{
         
         const response: QueryResult = await pool.query(
@@ -232,16 +214,14 @@ export class LocatarioPGRepository implements LocatarioRepository {
     }
 
 
-    public async getTotalLocatariosDePlaza(): Promise<[] | null> {
-
-        // const response: QueryResult = await pool.query(
-        //     "SELECT COUNT(plaza_id), plaza_id FROM locatarios WHERE plaza_id = $1 GROUP BY plaza_id",
-        //     [id]
-        //     );
-        const response: QueryResult = await pool.query(
-            "SELECT plaza_id, COUNT(plaza_id) AS total FROM locatarios GROUP BY plaza_id");
+    public async getquinceLocatariosPorPlaza(plaza_id: number): Promise<Locatario[] | null>{
         
-        if (response.rows.length) return response.rows as [];
+        const response: QueryResult = await pool.query(
+            "SELECT * FROM locatarios WHERE plaza_id = $1 ORDER BY updated_at DESC LIMIT 15;", 
+                [plaza_id]
+        );
+
+        if (response.rows.length) return response.rows as Locatario[];
         return null;
     }
 
@@ -257,6 +237,20 @@ export class LocatarioPGRepository implements LocatarioRepository {
         );
 
         if (response.rows.length) return response.rows as Locatario[];
+        return null;
+    }
+
+    
+    public async getTotalLocatariosDePlaza(): Promise<[] | null> {
+
+        // const response: QueryResult = await pool.query(
+        //     "SELECT COUNT(plaza_id), plaza_id FROM locatarios WHERE plaza_id = $1 GROUP BY plaza_id",
+        //     [id]
+        //     );
+        const response: QueryResult = await pool.query(
+            "SELECT plaza_id, COUNT(plaza_id) AS total FROM locatarios GROUP BY plaza_id");
+        
+        if (response.rows.length) return response.rows as [];
         return null;
     }
 

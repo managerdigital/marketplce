@@ -15,6 +15,6 @@ export interface Locatario {
     img: string | null;
     logo: string | null;
     activo: boolean;
-    created_at: Date | null;
-    updated_at: Date | null;
+    created_at?: Date | null;
+    updated_at?: Date | null;  
 }

@@ -1,6 +1,5 @@
 import { Request, Response } from 'express';
 import { GET, PUT, POST, route } from "awilix-express";
-import path = require('path');
 
 import { BaseController } from '../common/controllers/base.controller';
 import { LocatarioService } from '../services/locatarios.service';
@@ -21,8 +20,9 @@ export class locatarioController extends BaseController{
     public async store(req: Request, res: Response): Promise<void>{
 
         const user = req.user as {id: number, rol: string};
-
-        if(user.rol === 'SUPER_ADMIN') {
+        const rolAllow = ['SUPER_ADMIN', 'ADMIN_LOCATARIO'];
+        
+        if(rolAllow.includes(user.rol)) {
             const { 
                 admin_id, 
                 plaza_id, 
@@ -40,8 +40,9 @@ export class locatarioController extends BaseController{
                 logo
             } = req.body;
     
+            const emailLower = email.toLowerCase();
+
             try{
-    
                 const locatario = await this.locatarioService.store({
                     admin_id,
                     plaza_id,
@@ -52,7 +53,7 @@ export class locatarioController extends BaseController{
                     nombre,
                     apellido,
                     cedula,
-                    email,
+                    email: emailLower,
                     telefonos,
                     horarios,
                     img, 
@@ -79,7 +80,9 @@ export class locatarioController extends BaseController{
 
         const user = req.user as {id: number, rol: string};
 
-        if(user.rol === 'SUPER_ADMIN' || user.rol === 'LOCATARIO') {      
+        const rolAllow = ['SUPER_ADMIN', 'ADMIN_LOCATARIO'];
+        
+        if(rolAllow.includes(user.rol)) {
             const id = parseInt(req.params.id);  
             // const user = req.user as {id: number, rol: string};
             const { 
@@ -137,7 +140,9 @@ export class locatarioController extends BaseController{
 
         const user = req.user as {id: number, rol: string};
 
-        if(user.rol === 'SUPER_ADMIN') {
+        const rolAllow = ['SUPER_ADMIN', 'ADMIN_LOCATARIO'];
+        
+        if(rolAllow.includes(user.rol)) {
             const id = parseInt(req.params.id);  
     
             try {
@@ -158,7 +163,7 @@ export class locatarioController extends BaseController{
 
 
 
-    @route('/getAll')
+    @route('/obtenerTodo')
     @GET()
     public async getAll(req: Request, res: Response): Promise<void>{
         try {
@@ -198,15 +203,15 @@ export class locatarioController extends BaseController{
             this.handleException(error, res);
         }
     }
+    
 
-
-    @route('/findByNumeroDeLocalYPlazaId')
+    @route('/findByNumeroDeLocalYPlazaId/:numeroLocal/:plazaId')
     @GET()
     public async findByNumeroDeLocalYPlazaId(req: Request, res: Response): Promise<void>{
-        // const plazaId = parseInt(req.params.plazaId);  
-        // const numeroLocal = parseInt(req.params.nLocal);  
 
-        const { plazaId, numeroLocal } = req.body;
+        // const { plazaId, numeroLocal } = req.body;
+        const numeroLocal = parseInt(req.params.numeroLocal);  
+        const plazaId = parseInt(req.params.plazaId);  
 
         try{
             const locatario = await this.locatarioService.findByNumeroDeLocalYPlazaId(numeroLocal, plazaId);
@@ -226,14 +231,14 @@ export class locatarioController extends BaseController{
     @GET()
     public async findByCedula(req: Request, res: Response): Promise<void>{
 
-        const cedula = parseInt(req.params.cedula);
-
         try{
-            const locatario = await this.locatarioService.findByCedula(cedula);
+            const cedula = parseInt(req.params.cedula);
+
+            const locatarios = await this.locatarioService.findByCedula(cedula) as Locatario[];
             
             res.status(200).json({
                 ok: true,
-                locatario
+                locatarios
             });
 
         } catch(error) {
@@ -248,7 +253,6 @@ export class locatarioController extends BaseController{
     @GET()
     public async getTotalLocatariosDePlaza(req: Request, res: Response): Promise<void>{
         try{
-            // const id = parseInt(req.params.id);  
             const cantidadLocales = await this.locatarioService.getTotalLocatariosDePlaza();
 
             res.status(200).json({
@@ -262,6 +266,24 @@ export class locatarioController extends BaseController{
     }
 
 
+    @route('/locatariosPorPlazaYCategoria/:plazaid/:categoriaid')
+    @GET()
+    public async getLocatariosPorPlazaYCategoria(req: Request, res: Response): Promise<void>{
+        try{
+            const plaza_id = parseInt(req.params.plazaid);  
+            const categoria_id = parseInt(req.params.categoriaid);  
+
+            const locatarios = await this.locatarioService.getLocatariosPorPlazaYCategoria(plaza_id, categoria_id);
+
+            res.status(200).json({
+                ok: true,
+                locatarios
+            });
+
+        }catch(error){
+            this.handleException(error, res);
+        }
+    }
 
 
     @route('/locatariosPorPlaza/:plazaid')
@@ -270,6 +292,24 @@ export class locatarioController extends BaseController{
         try{
             const plaza_id = parseInt(req.params.plazaid);  
             const locatarios = await this.locatarioService.getLocatariosPorPlaza(plaza_id);
+
+            res.status(200).json({
+                ok: true,
+                locatarios
+            });
+
+        }catch(error){
+            this.handleException(error, res);
+        }
+    }
+
+
+    @route('/quinceLocatariosPorPlaza/:plazaid')
+    @GET()
+    public async getquinceLocatariosPorPlaza(req: Request, res: Response): Promise<void>{
+        try{
+            const plaza_id = parseInt(req.params.plazaid);  
+            const locatarios = await this.locatarioService.getquinceLocatariosPorPlaza(plaza_id);
 
             res.status(200).json({
                 ok: true,
@@ -309,7 +349,7 @@ export class locatarioController extends BaseController{
 
 
     @route('/locatariosPorPlazaCortoPaginado/:plazaid')
-    @GET()
+    @POST()
     public async locatariosPorPlazaCortoPaginado(req: Request, res: Response): Promise<void>{
         try{
             const {desde, hasta} = req.body;
@@ -334,57 +374,6 @@ export class locatarioController extends BaseController{
             this.handleException(error, res);
         }
     }
-
-
-    @route('/subirCSV')
-    @POST()
-    public async subirCSV(req: Request, res: Response): Promise<void>{
-
-        const user = req.user as {id: number, rol: string};
-
-        if(user.rol === 'SUPER_ADMIN') { 
-            if (!req.files || Object.keys(req.files).length === 0) {
-                res.status(400).json({
-                    ok: false,
-                    msg: 'No hay ningun archivo'
-                });
-                return;
-            }
     
-            const file = req.files.archivo;
-    
-            try{
-                
-                await this.locatarioService.convert2Excel(file, user.id);
-    
-                res.status(200).json({
-                    ok: true,
-                    msg: 'Se subio el archivo con exito'
-                });
-    
-            } catch(error){
-                this.handleException(error, res);
-            }
-        }
-    }
-
-
-    
-    @route('/descargaPlantilla')
-    @GET()
-    public async descargaPlantilla(req: Request, res: Response): Promise<void>{
-        // const user = req.user as {id: number, rol: string};
-
-        // if(user.rol === 'SUPER_ADMIN') {     
-            try{
-                const pathXLSX = path.join(__dirname, `../../uploads/XLSX/formato.xlsx`);
-                res.download(pathXLSX, 'formato.xlsx');
-
-            } catch(error){
-                this.handleException(error, res);
-            }
-        // }
-    }
-
 
 }
