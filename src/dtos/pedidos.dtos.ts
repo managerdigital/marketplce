@@ -1,11 +1,11 @@
 import { PedidosEstados } from '../common/enums/pedidos-estados';
+
 export interface PedidoCreateDto{
     pasarela_pagos_id?: number;
     plaza_id: number,
     cliente_id: number;
     locatorios_id: number,
     productos_locatarios_id: number[];
-    pagado: boolean;
     estado: PedidosEstados;
     total: number;
 }
@@ -17,7 +17,6 @@ export interface PedidoUpdateDto{
     cliente_id?: number;
     locatorios_id?: number,
     productos_locatarios_id?: number[];
-    pagado?: boolean;
     estado: PedidosEstados;
     total?: number;
 }    

@@ -37,13 +37,12 @@ export class PedidoPGRepository implements PedidoRepository {
         const now = new Date();
 
         await pool.query(
-            "UPDATE pedidos SET plaza_id = $1, locatorios_id = $2, cliente_id = $3, productos_locatarios_id = $4, pagado = $5, estado = $6, total = $7, updated_at = $8 WHERE id = $9",
+            "UPDATE pedidos SET plaza_id = $1, locatorios_id = $2, cliente_id = $3, productos_locatarios_id = $4, estado = $5, total = $6, updated_at = $7 WHERE id = $8",
             [ 
                 entry.plaza_id, 
                 entry.locatorios_id, 
                 entry.cliente_id, 
                 entry.productos_locatarios_id, 
-                entry.pagado, 
                 entry.estado, 
                 entry.total, 
                 now, 
@@ -73,7 +72,7 @@ export class PedidoPGRepository implements PedidoRepository {
 
 
     async getAll(): Promise<Pedido[] | null> {
-        const response: QueryResult = await pool.query("select * from pedidos ORDER BY id DESC");
+        const response: QueryResult = await pool.query("SELECT * FROM pedidos ORDER BY id DESC");
 
         if (response.rows.length) return response.rows as Pedido[];
         return null;
@@ -107,6 +106,16 @@ export class PedidoPGRepository implements PedidoRepository {
             [clienteId]
         );
         if (response.rows.length) return response.rows[0];
+        return null;
+    }
+
+
+    async getPedidosPorCliente(clienteId: number): Promise<Pedido[] | null> {
+        const response: QueryResult = await pool.query(
+            "SELECT * FROM pedidos WHERE cliente_id = $1 AND estado != '3'",
+            [clienteId]
+        );
+        if (response.rows.length) return response.rows;
         return null;
     }
 }

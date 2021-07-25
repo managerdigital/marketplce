@@ -1,10 +1,8 @@
 import { Request, Response } from 'express';
-import { GET, PUT, POST, route } from "awilix-express";
+import { GET, route } from "awilix-express";
 
 import { BaseController } from '../common/controllers/base.controller';
 
-import { PlazaCreateDto, PlazaUpdateDto } from '../dtos/plazas.dto';
-// import { authenticate } from '../common/middlewares/authenticate';
 import { Plaza } from '../services/repositories/domain/plazas.domain';
 
 import { PlazaService } from '../services/plazas.service';
@@ -22,54 +20,54 @@ export class plazaController extends BaseController{
     }
 
 
-    @route('/crear')
-    @POST()
-    public async store(req: Request, res: Response): Promise<void>{
+    // @route('/crear')
+    // @POST()
+    // public async store(req: Request, res: Response): Promise<void>{
     
-        const user = req.user as {id: number, rol: string};
+    //     const user = req.user as {id: number, rol: string};
 
-        if(user.rol === 'SUPER_ADMIN') {
-            const { 
-                admin_id, 
-                localidad_id, 
-                categorias_id, 
-                nombre, 
-                direccion, 
-                telefonos, 
-                email, 
-                horarios,
-                img,
-                logo
-            } = req.body;
+    //     if(user.rol === 'SUPER_ADMIN') {
+    //         const { 
+    //             admin_id, 
+    //             localidad_id, 
+    //             categorias_id, 
+    //             nombre, 
+    //             direccion, 
+    //             telefonos, 
+    //             email, 
+    //             horarios,
+    //             img,
+    //             logo
+    //         } = req.body;
     
-            try{
+    //         try{
     
-                const plaza = await this.plazaService.store({
-                    admin_id,
-                    localidad_id,
-                    categorias_id,
-                    nombre,
-                    direccion,
-                    telefonos,
-                    email,
-                    horarios,
-                    img,
-                    logo
-                } as PlazaCreateDto);
+    //             const plaza = await this.plazaService.store({
+    //                 admin_id,
+    //                 localidad_id,
+    //                 categorias_id,
+    //                 nombre,
+    //                 direccion,
+    //                 telefonos,
+    //                 email,
+    //                 horarios,
+    //                 img,
+    //                 logo
+    //             } as PlazaCreateDto);
                 
-                res.status(200).json({
-                    ok: true,
-                    msg: 'Plaza creada con exito',
-                    plaza
-                });
+    //             res.status(200).json({
+    //                 ok: true,
+    //                 msg: 'Plaza creada con exito',
+    //                 plaza
+    //             });
                                                 
-            }catch(error){
-                this.handleException(error, res);
-            }
+    //         }catch(error){
+    //             this.handleException(error, res);
+    //         }
     
-        }
+    //     }
         
-    }
+    // }
     
     
     @route('/categoriasPorPlazaId/:id')
@@ -149,22 +147,7 @@ export class plazaController extends BaseController{
             this.handleException(error, res);
         }
     }
-    
-    // id: number,
-    // admin_id: number[],
-    // localidad_id: number;
-    // categorias_id: number[];
-    // nombre: string,
-    // direccion: string,
-    // telefonos: number[],
-    // email: string,
-    // img: string,
-    // logo: string,
-    // horarios: string[],
-    // activo: boolean,
-    // created_at: Date | null,
-    // updated_at: Date | null,
-    
+
     
     @route('/buscarPorID/:id')
     @GET()
@@ -226,80 +209,80 @@ export class plazaController extends BaseController{
 
 
 
-    @route('/update/:id')
-    @PUT()
-    public async update(req: Request, res: Response): Promise<void>{
+    // @route('/update/:id')
+    // @PUT()
+    // public async update(req: Request, res: Response): Promise<void>{
         
-        const user = req.user as {id: number, rol: string};
+    //     const user = req.user as {id: number, rol: string};
 
-        if(user.rol === 'SUPER_ADMIN') {
-            const id = parseInt(req.params.id);  
-            const { 
-                admin_id, 
-                plaza_id, 
-                localidad_id, 
-                categorias_id, 
-                nombre, 
-                direccion, 
-                email, 
-                telefonos, 
-                horarios, 
-                activo,
-                img, 
-                logo
-            } = req.body;
+    //     if(user.rol === 'SUPER_ADMIN') {
+    //         const id = parseInt(req.params.id);  
+    //         const { 
+    //             admin_id, 
+    //             plaza_id, 
+    //             localidad_id, 
+    //             categorias_id, 
+    //             nombre, 
+    //             direccion, 
+    //             email, 
+    //             telefonos, 
+    //             horarios, 
+    //             activo,
+    //             img, 
+    //             logo
+    //         } = req.body;
     
-            try {
-                await this.plazaService.update(id, {
-                    admin_id,
-                    plaza_id,
-                    localidad_id,
-                    categorias_id,
-                    nombre,
-                    direccion,
-                    telefonos,
-                    email,
-                    horarios,
-                    activo,
-                    img, 
-                    logo
-                } as PlazaUpdateDto);
+    //         try {
+    //             await this.plazaService.update(id, {
+    //                 admin_id,
+    //                 plaza_id,
+    //                 localidad_id,
+    //                 categorias_id,
+    //                 nombre,
+    //                 direccion,
+    //                 telefonos,
+    //                 email,
+    //                 horarios,
+    //                 activo,
+    //                 img, 
+    //                 logo
+    //             } as PlazaUpdateDto);
     
-                res.status(200).json({
-                    ok: true,
-                    msg: "Plaza actualizada con exito!"
-                });
-            } catch(error){
-                this.handleException(error, res);
-            }
-        }
-    }
+    //             res.status(200).json({
+    //                 ok: true,
+    //                 msg: "Plaza actualizada con exito!"
+    //             });
+    //         } catch(error){
+    //             this.handleException(error, res);
+    //         }
+    //     }
+    // }
 
 
 
-    @route('/delete/:id')
-    @PUT()
-    public async delete(req: Request, res: Response): Promise<void>{
+    // @route('/delete/:id')
+    // @PUT()
+    // public async delete(req: Request, res: Response): Promise<void>{
 
-        const user = req.user as {id: number, rol: string};
+    //     const user = req.user as {id: number, rol: string};
 
-        if(user.rol === 'SUPER_ADMIN') {
-            const id = parseInt(req.params.id);  
+    //     if(user.rol === 'SUPER_ADMIN') {
+    //         const id = parseInt(req.params.id);  
     
-            try {
+    //         try {
     
-                await this.plazaService.delete(id);
+    //             await this.plazaService.delete(id);
                 
-                res.status(200).json({
-                    ok: true,
-                    msg: "Plaza borrada con exito!"
-                });
+    //             res.status(200).json({
+    //                 ok: true,
+    //                 msg: "Plaza borrada con exito!"
+    //             });
     
-            } catch(error){
-                this.handleException(error, res);
-            }
-        }
-    }
+    //         } catch(error){
+    //             this.handleException(error, res);
+    //         }
+    //     }
+    // }
 
 }
 

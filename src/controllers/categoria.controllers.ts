@@ -1,5 +1,5 @@
 import { Request, Response } from 'express';
-import { GET, PUT, route } from "awilix-express";
+import { GET, route } from "awilix-express";
 
 import { BaseController } from "../common/controllers/base.controller";
 
@@ -231,27 +231,27 @@ export class categoriaController extends BaseController{
 
 
 
-    @route('/delete/:id')
-    @PUT()
-    public async delete(req: Request, res: Response): Promise<void>{
-        const user = req.user as {id: number, rol: string};
+    // @route('/delete/:id')
+    // @PUT()
+    // public async delete(req: Request, res: Response): Promise<void>{
+    //     const user = req.user as {id: number, rol: string};
 
-        if(user.rol === 'SUPER_ADMIN') {
-            const id = parseInt(req.params.id);  
+    //     if(user.rol === 'SUPER_ADMIN') {
+    //         const id = parseInt(req.params.id);  
     
-            try {
-                await this.categoriaService.delete(id);
+    //         try {
+    //             await this.categoriaService.delete(id);
                 
-                res.status(200).json({
-                    ok: true,
-                    msg: "Categoría borrada con exito!"
-                });
+    //             res.status(200).json({
+    //                 ok: true,
+    //                 msg: "Categoría borrada con exito!"
+    //             });
     
-            } catch(error){
-                this.handleException(error, res);
-            }
-        }
-    }
+    //         } catch(error){
+    //             this.handleException(error, res);
+    //         }
+    //     }
+    // }
 
 
 }

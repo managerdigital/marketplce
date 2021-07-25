@@ -17,6 +17,9 @@ import { BalanceService } from './services/balance.service';
 import { CalificacionService } from './services/calificacion.service';
 import { PromocionService } from './services/promociones.service';
 import { VentasProductosLocatariosService } from './services/ventasProductosLocatarios.service';
+import { FavoritoService } from './services/favorito.service';
+import { VentasCategoriasService } from './services/ventasCategorias.service';
+import { BoletinesService } from './services/boletines.service';
 
 
 import { AdminPGRepository } from './services/repositories/implementation/pg/admin.imp';
@@ -32,6 +35,9 @@ import { BalancePGRepository } from './services/repositories/implementation/pg/b
 import { CalificacionPGRepository } from './services/repositories/implementation/pg/calificaciones.imp';
 import { PromocionesPGRepository } from './services/repositories/implementation/pg/promociones.imp';
 import { VentasProductosLocatariosPGRepository } from './services/repositories/implementation/pg/ventasProductosLocatarios.imp';
+import { FavoritosPGRepository } from './services/repositories/implementation/pg/favoritos.imp';
+import { VentasCategoriasPGRepository } from './services/repositories/implementation/pg/ventasCategorias.imp';
+import { BoletinesPGRepository } from './services/repositories/implementation/pg/boletines.imp';
 
 
 
@@ -57,6 +63,9 @@ export default (app: express.Application): void => {
         calificacionRepository: asClass(CalificacionPGRepository).scoped(),
         promocionesRepository: asClass(PromocionesPGRepository).scoped(),
         ventasProductosLocatariosRepository: asClass(VentasProductosLocatariosPGRepository).scoped(),
+        favoritoRepository: asClass(FavoritosPGRepository).scoped(),
+        ventasCategoriasRepository: asClass(VentasCategoriasPGRepository).scoped(),
+        boletinesRepository: asClass(BoletinesPGRepository).scoped(),
         
         // Services
         adminService: asClass(AdminService).scoped(),
@@ -72,6 +81,9 @@ export default (app: express.Application): void => {
         calificacionService: asClass(CalificacionService).scoped(),
         promocionService: asClass(PromocionService).scoped(),
         ventasProductosLocatariosService: asClass(VentasProductosLocatariosService).scoped(),
+        favoritoService: asClass(FavoritoService).scoped(),
+        ventasCategoriasService: asClass(VentasCategoriasService).scoped(),
+        boletinesService: asClass(BoletinesService).scoped(),
         
         testService: asClass(TestService).scoped(),
     });

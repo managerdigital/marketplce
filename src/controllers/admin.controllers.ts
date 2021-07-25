@@ -1,205 +1,205 @@
-import { Request, Response } from 'express';
-import { GET, PUT, POST, route } from "awilix-express";
+// import { Request, Response } from 'express';
+// import { GET, PUT, POST, route } from "awilix-express";
 
-import { BaseController } from "../common/controllers/base.controller";
+// import { BaseController } from "../common/controllers/base.controller";
 
-import { AdminService } from '../services/admin.service';
+// import { AdminService } from '../services/admin.service';
 
-import { AdminCreateDto, AdminUpdateDto } from '../dtos/admin.dto';
-import { AdminController } from '../services/repositories/domain/admin.domain';
+// import { AdminCreateDto, AdminUpdateDto } from '../dtos/admin.dto';
+// import { AdminController } from '../services/repositories/domain/admin.domain';
 
-// SUPER_ADMIN, ADMIN_LOCATARIO, LOCATARIO
-@route('/admins')
-export class adminController extends BaseController{
+// // SUPER_ADMIN, ADMIN_LOCATARIO, LOCATARIO
+// @route('/admins')
+// export class adminController extends BaseController{
 
-    constructor(private readonly adminService: AdminService){
-        super();
-    }
+//     constructor(private readonly adminService: AdminService){
+//         super();
+//     }
 
-    @route('/getAdmin/:id')
-    @GET()
-    public async getById(req: Request, res: Response): Promise<void>{
-        try{
-            const id = parseInt(req.params.id);
-            const admin = await this.adminService.findById(id) as AdminController;
+//     @route('/getAdmin/:id')
+//     @GET()
+//     public async getById(req: Request, res: Response): Promise<void>{
+//         try{
+//             const id = parseInt(req.params.id);
+//             const admin = await this.adminService.findById(id) as AdminController;
             
-            delete admin.password;
-            delete admin.token_reset;
+//             delete admin.password;
+//             delete admin.token_reset;
     
-            res.status(200).json({
-                ok: true,
-                admin
-            });    
-        } catch(error) {
-            this.handleException(error, res); 
-        }
-    }
+//             res.status(200).json({
+//                 ok: true,
+//                 admin
+//             });    
+//         } catch(error) {
+//             this.handleException(error, res); 
+//         }
+//     }
 
-    @route('/getAll')
-    @GET()
-    public async getAll(req: Request, res: Response): Promise<void>{
+//     @route('/getAll')
+//     @GET()
+//     public async getAll(req: Request, res: Response): Promise<void>{
 
-        try {
-            const admins = await this.adminService.getAll();
+//         try {
+//             const admins = await this.adminService.getAll();
 
-            res.status(200).json({
-                ok: true,
-                admins
-            });
+//             res.status(200).json({
+//                 ok: true,
+//                 admins
+//             });
 
-        } catch(error){
-            this.handleException(error, res);
-        }
+//         } catch(error){
+//             this.handleException(error, res);
+//         }
 
-    }
+//     }
 
-    @route('/updateAdmin/:id')
-    @PUT()
-    public async update(req: Request, res: Response): Promise<void>{
-        const user = req.user as {id: number, rol: string};
+//     @route('/updateAdmin/:id')
+//     @PUT()
+//     public async update(req: Request, res: Response): Promise<void>{
+//         const user = req.user as {id: number, rol: string};
 
-        if(user.rol === 'SUPER_ADMIN') {
+//         if(user.rol === 'SUPER_ADMIN') {
             
-            const id = parseInt(req.params.id);
+//             const id = parseInt(req.params.id);
             
-            const {
-                nombre,
-                apellido, 
-                telefono, 
-                cedula,
-                img
-            } = req.body;
+//             const {
+//                 nombre,
+//                 apellido, 
+//                 telefono, 
+//                 cedula,
+//                 img
+//             } = req.body;
 
-            try{
-                await this.adminService.update(id, {
-                    nombre,
-                    apellido,
-                    telefono,
-                    img,
-                    cedula
-                } as AdminUpdateDto);
+//             try{
+//                 await this.adminService.update(id, {
+//                     nombre,
+//                     apellido,
+//                     telefono,
+//                     img,
+//                     cedula
+//                 } as AdminUpdateDto);
     
-                res.status(200).json({
-                    ok: true,
-                    msg: 'Admin Actualizado'
-                });
+//                 res.status(200).json({
+//                     ok: true,
+//                     msg: 'Admin Actualizado'
+//                 });
     
-            } catch(error) {
-                this.handleException(error, res);
-            }
+//             } catch(error) {
+//                 this.handleException(error, res);
+//             }
             
-        }
-    }
+//         }
+//     }
 
 
 
 
-    @route('/change-password')
-    @PUT()
-    public async changePassword(req: Request, res: Response): Promise<void> {
+//     @route('/change-password')
+//     @PUT()
+//     public async changePassword(req: Request, res: Response): Promise<void> {
 
-        const { email, newPassword, oldPassword } = req.body;
+//         const { email, newPassword, oldPassword } = req.body;
 
-        const user = req.user as {id: number};
+//         const user = req.user as {id: number};
 
-        try {
-            await this.adminService.changePassword(user.id, email, oldPassword, newPassword);
+//         try {
+//             await this.adminService.changePassword(user.id, email, oldPassword, newPassword);
 
-            res.status(200).json({
-                ok: true,
-                msg: 'Cambio de contraseña con exito!'
-            });
-        } catch(error) {
-            this.handleException(error, res);
-        }
-    }
-
-
+//             res.status(200).json({
+//                 ok: true,
+//                 msg: 'Cambio de contraseña con exito!'
+//             });
+//         } catch(error) {
+//             this.handleException(error, res);
+//         }
+//     }
 
 
-     @route('/registerAdmin')
-     @POST()
-     public async registro(req: Request, res: Response): Promise<void>{
+
+
+//      @route('/registerAdmin')
+//      @POST()
+//      public async registro(req: Request, res: Response): Promise<void>{
  
-         const { 
-            nombre, 
-            apellido, 
-            telefono, 
-            cedula, 
-            email, 
-            password,
-            img, 
-            rol 
-        } = req.body;
+//          const { 
+//             nombre, 
+//             apellido, 
+//             telefono, 
+//             cedula, 
+//             email, 
+//             password,
+//             img, 
+//             rol 
+//         } = req.body;
 
-        try {
-            const emailLowerCase = email.toLowerCase();
-            const admin = await this.adminService.store({
-                nombre,
-                apellido,
-                telefono,
-                cedula,
-                email: emailLowerCase,
-                password,
-                img,
-                rol 
-            } as AdminCreateDto) as AdminController;
+//         try {
+//             const emailLowerCase = email.toLowerCase();
+//             const admin = await this.adminService.store({
+//                 nombre,
+//                 apellido,
+//                 telefono,
+//                 cedula,
+//                 email: emailLowerCase,
+//                 password,
+//                 img,
+//                 rol 
+//             } as AdminCreateDto) as AdminController;
             
-            delete admin.password;
-            delete admin.token_reset;
+//             delete admin.password;
+//             delete admin.token_reset;
 
-            res.status(200).json({
-                ok: true,
-                msg: "Administrador creado exitosamente!",
-                admin
-            });
+//             res.status(200).json({
+//                 ok: true,
+//                 msg: "Administrador creado exitosamente!",
+//                 admin
+//             });
             
-        } catch(error) {
-            this.handleException(error, res);
-        }   
-     }
+//         } catch(error) {
+//             this.handleException(error, res);
+//         }   
+//      }
 
 
 
-    @route('/renewToken')
-    @GET()
-    public async reNewToken(req: Request, res: Response): Promise<void>{
+//     @route('/renewToken')
+//     @GET()
+//     public async reNewToken(req: Request, res: Response): Promise<void>{
         
-        const token = req.headers.token as string;
+//         const token = req.headers.token as string;
 
-        try {
-            // const newToken = await this.adminService.renewToken(token);
-            const newToken = await this.adminService.renewToken(token);
+//         try {
+//             // const newToken = await this.adminService.renewToken(token);
+//             const newToken = await this.adminService.renewToken(token);
 
-            res.status(200).json({
-                ok: true,
-                token: newToken,
-            });
+//             res.status(200).json({
+//                 ok: true,
+//                 token: newToken,
+//             });
 
-        }catch(error) {
-            this.handleException(error, res);     
-        }
-    }
+//         }catch(error) {
+//             this.handleException(error, res);     
+//         }
+//     }
 
 
 
-    @route('/findByCedula/:cedula')
-    @GET()
-    public async find(req: Request, res: Response): Promise<void>{
+//     @route('/findByCedula/:cedula')
+//     @GET()
+//     public async find(req: Request, res: Response): Promise<void>{
 
-        try{
-            const cedula = parseInt(req.params.cedula);
-            const admin = await this.adminService.findByCedula(cedula);
+//         try{
+//             const cedula = parseInt(req.params.cedula);
+//             const admin = await this.adminService.findByCedula(cedula);
             
-            res.status(200).json({
-                ok: true,
-                admin
-            });
+//             res.status(200).json({
+//                 ok: true,
+//                 admin
+//             });
 
-        }catch(error) {
-            this.handleException(error, res);
-        }
-    }
+//         }catch(error) {
+//             this.handleException(error, res);
+//         }
+//     }
 
 
-}
+// }

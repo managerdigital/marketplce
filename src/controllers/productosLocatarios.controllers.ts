@@ -50,12 +50,12 @@ export class productoLocatariosController extends BaseController{
                     imagenes: [
                         productoGeneral.imagen_1,
                         productoGeneral.imagen_2
-                    ]
+                    ],
+                    categorias: categoriasReturn,
+                    visitas: this.getRandomArbitrary(1, 100),
+                    calificacion: this.getRandomArbitrary(3.5, 10),
+                    vendidos: this.getRandomArbitrary(0, 20)
                 },
-                categorias: categoriasReturn,
-                visitas: this.getRandomArbitrary(1, 100),
-                calificacion: this.getRandomArbitrary(3.5, 10),
-                vendidos: this.getRandomArbitrary(0, 20)
             });
 
         } catch(error) {
@@ -113,7 +113,8 @@ export class productoLocatariosController extends BaseController{
                         productoGeneral.imagen_1,
                         productoGeneral.imagen_2
                     ],
-                    unidad: productoGeneral.unidad
+                    unidad: productoGeneral.unidad,
+                    sku: productoGeneral.sku
                 })
             }
 
@@ -163,7 +164,7 @@ export class productoLocatariosController extends BaseController{
 
             res.status(200).json({
                 ok: true,
-                productos: productosReturn
+                productos: productos
             });
 
         } catch(error) {
@@ -232,7 +233,8 @@ export class productoLocatariosController extends BaseController{
                         productoGeneral.imagen_1,
                         productoGeneral.imagen_2
                     ],
-                    unidad: productoGeneral.unidad
+                    unidad: productoGeneral.unidad,
+                    sku: productoGeneral.sku
                 })
             }
 
@@ -274,7 +276,8 @@ export class productoLocatariosController extends BaseController{
                         productoGeneral.imagen_1,
                         productoGeneral.imagen_2
                     ],
-                    unidad: productoGeneral.unidad
+                    unidad: productoGeneral.unidad,
+                    sku: productoGeneral.sku
                 })
             }
 

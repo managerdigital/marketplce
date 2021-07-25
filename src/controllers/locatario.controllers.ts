@@ -1,9 +1,8 @@
 import { Request, Response } from 'express';
-import { GET, PUT, POST, route } from "awilix-express";
+import { GET, POST, route } from "awilix-express";
 
 import { BaseController } from '../common/controllers/base.controller';
 import { LocatarioService } from '../services/locatarios.service';
-import { LocatarioCreateDto, LocatarioUpdateDto } from '../dtos/locatario.dto';
 import { Locatario } from '../services/repositories/domain/locatario.domain';
 
 
@@ -15,150 +14,150 @@ export class locatarioController extends BaseController{
     }
 
 
-    @route('/crear')
-    @POST()
-    public async store(req: Request, res: Response): Promise<void>{
+    // @route('/crear')
+    // @POST()
+    // public async store(req: Request, res: Response): Promise<void>{
 
-        const user = req.user as {id: number, rol: string};
-        const rolAllow = ['SUPER_ADMIN', 'ADMIN_LOCATARIO'];
+    //     const user = req.user as {id: number, rol: string};
+    //     const rolAllow = ['SUPER_ADMIN', 'ADMIN_LOCATARIO'];
         
-        if(rolAllow.includes(user.rol)) {
-            const { 
-                admin_id, 
-                plaza_id, 
-                nombre_local, 
-                numero_local, 
-                nombre, 
-                apellido, 
-                cedula, 
-                email, 
-                productos_locatarios_id, 
-                categorias_id, 
-                telefonos, 
-                horarios,
-                img,
-                logo
-            } = req.body;
+    //     if(rolAllow.includes(user.rol)) {
+    //         const { 
+    //             admin_id, 
+    //             plaza_id, 
+    //             nombre_local, 
+    //             numero_local, 
+    //             nombre, 
+    //             apellido, 
+    //             cedula, 
+    //             email, 
+    //             productos_locatarios_id, 
+    //             categorias_id, 
+    //             telefonos, 
+    //             horarios,
+    //             img,
+    //             logo
+    //         } = req.body;
     
-            const emailLower = email.toLowerCase();
+    //         const emailLower = email.toLowerCase();
 
-            try{
-                const locatario = await this.locatarioService.store({
-                    admin_id,
-                    plaza_id,
-                    categorias_id,
-                    productos_locatarios_id,
-                    nombre_local,
-                    numero_local,
-                    nombre,
-                    apellido,
-                    cedula,
-                    email: emailLower,
-                    telefonos,
-                    horarios,
-                    img, 
-                    logo
-                } as LocatarioCreateDto);
+    //         try{
+    //             const locatario = await this.locatarioService.store({
+    //                 admin_id,
+    //                 plaza_id,
+    //                 categorias_id,
+    //                 productos_locatarios_id,
+    //                 nombre_local,
+    //                 numero_local,
+    //                 nombre,
+    //                 apellido,
+    //                 cedula,
+    //                 email: emailLower,
+    //                 telefonos,
+    //                 horarios,
+    //                 img, 
+    //                 logo
+    //             } as LocatarioCreateDto);
     
-                res.status(200).json({
-                    ok: true,
-                    locatario
-                });
+    //             res.status(200).json({
+    //                 ok: true,
+    //                 locatario
+    //             });
     
-            }catch(error){
-                this.handleException(error, res);
-            }
-        }
+    //         }catch(error){
+    //             this.handleException(error, res);
+    //         }
+    //     }
         
-    }
+    // }
 
 
 
-    @route('/update/:id')
-    @PUT()
-    public async update(req: Request, res: Response): Promise<void>{
+    // @route('/update/:id')
+    // @PUT()
+    // public async update(req: Request, res: Response): Promise<void>{
 
-        const user = req.user as {id: number, rol: string};
+    //     const user = req.user as {id: number, rol: string};
 
-        const rolAllow = ['SUPER_ADMIN', 'ADMIN_LOCATARIO'];
+    //     const rolAllow = ['SUPER_ADMIN', 'ADMIN_LOCATARIO'];
         
-        if(rolAllow.includes(user.rol)) {
-            const id = parseInt(req.params.id);  
-            // const user = req.user as {id: number, rol: string};
-            const { 
-                admin_id, 
-                plaza_id, 
-                nombre_local, 
-                numero_local, 
-                nombre, 
-                apellido, 
-                cedula, 
-                email, 
-                categorias_id, 
-                productos_locatarios_id, 
-                telefonos, 
-                horarios, 
-                activo,
-                img,
-                logo
-            } = req.body;
+    //     if(rolAllow.includes(user.rol)) {
+    //         const id = parseInt(req.params.id);  
+    //         // const user = req.user as {id: number, rol: string};
+    //         const { 
+    //             admin_id, 
+    //             plaza_id, 
+    //             nombre_local, 
+    //             numero_local, 
+    //             nombre, 
+    //             apellido, 
+    //             cedula, 
+    //             email, 
+    //             categorias_id, 
+    //             productos_locatarios_id, 
+    //             telefonos, 
+    //             horarios, 
+    //             activo,
+    //             img,
+    //             logo
+    //         } = req.body;
             
-            try {
-                await this.locatarioService.update(id, {
-                    admin_id,
-                    plaza_id,
-                    categorias_id,
-                    productos_locatarios_id,
-                    nombre_local,
-                    numero_local,
-                    nombre,
-                    apellido,
-                    cedula,
-                    email,
-                    telefonos,
-                    horarios,
-                    activo,
-                    img,
-                    logo
-                } as LocatarioUpdateDto);
+    //         try {
+    //             await this.locatarioService.update(id, {
+    //                 admin_id,
+    //                 plaza_id,
+    //                 categorias_id,
+    //                 productos_locatarios_id,
+    //                 nombre_local,
+    //                 numero_local,
+    //                 nombre,
+    //                 apellido,
+    //                 cedula,
+    //                 email,
+    //                 telefonos,
+    //                 horarios,
+    //                 activo,
+    //                 img,
+    //                 logo
+    //             } as LocatarioUpdateDto);
     
-                res.status(200).json({
-                    ok: true,
-                    msg: "Local actualizado con exito!"
-                });
-            } catch(error){
-                this.handleException(error, res);
-            }
-        }
-    }
+    //             res.status(200).json({
+    //                 ok: true,
+    //                 msg: "Local actualizado con exito!"
+    //             });
+    //         } catch(error){
+    //             this.handleException(error, res);
+    //         }
+    //     }
+    // }
 
 
 
-    @route('/delete/:id')
-    @PUT()
-    public async delete(req: Request, res: Response): Promise<void>{
+    // @route('/delete/:id')
+    // @PUT()
+    // public async delete(req: Request, res: Response): Promise<void>{
 
-        const user = req.user as {id: number, rol: string};
+    //     const user = req.user as {id: number, rol: string};
 
-        const rolAllow = ['SUPER_ADMIN', 'ADMIN_LOCATARIO'];
+    //     const rolAllow = ['SUPER_ADMIN', 'ADMIN_LOCATARIO'];
         
-        if(rolAllow.includes(user.rol)) {
-            const id = parseInt(req.params.id);  
+    //     if(rolAllow.includes(user.rol)) {
+    //         const id = parseInt(req.params.id);  
     
-            try {
+    //         try {
     
-                await this.locatarioService.delete(id);
+    //             await this.locatarioService.delete(id);
                 
-                res.status(200).json({
-                    ok: true,
-                    msg: "Local borrada con exito!"
-                });
+    //             res.status(200).json({
+    //                 ok: true,
+    //                 msg: "Local borrada con exito!"
+    //             });
     
-            } catch(error){
-                this.handleException(error, res);
-            }
-        }
-    }
+    //         } catch(error){
+    //             this.handleException(error, res);
+    //         }
+    //     }
+    // }
 
 
 

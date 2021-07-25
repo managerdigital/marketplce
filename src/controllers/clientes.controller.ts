@@ -1,10 +1,10 @@
 import { Request, Response } from 'express';
-import { GET, PUT, POST, route } from "awilix-express";
+import { GET, PUT, route } from "awilix-express";
 
 import { BaseController } from "../common/controllers/base.controller";
 
 import { ClienteService } from '../services/clientes.service';
-import { ClienteCreateDto, ClienteUpdatedDto } from '../dtos/clientes.dto';
+import { ClienteUpdatedDto } from '../dtos/clientes.dto';
 
 
 // SUPER_ADMIN, ADMIN_LOCATARIO, LOCATARIO
@@ -15,42 +15,42 @@ export class clienteController extends BaseController{
         super();
     }
 
-    @route('/crear')
-    @POST()
-    public async store(req: Request, res: Response): Promise<void>{
-        try{
-            const {
-                email, 
-                password, 
-                nombre, 
-                telefono, 
-                direccion, 
-                cedula,
-                img
-            } = req.body;
+    // @route('/crear')
+    // @POST()
+    // public async store(req: Request, res: Response): Promise<void>{
+    //     try{
+    //         const {
+    //             email, 
+    //             password, 
+    //             nombre, 
+    //             telefono, 
+    //             direccion, 
+    //             cedula,
+    //             img
+    //         } = req.body;
 
-            const cliente = await this.clienteService.store({
-                email,
-                password,
-                nombre,
-                cedula,
-                telefono,
-                direccion,
-                img
-            } as ClienteCreateDto);
+    //         const cliente = await this.clienteService.store({
+    //             email,
+    //             password,
+    //             nombre,
+    //             cedula,
+    //             telefono,
+    //             direccion,
+    //             img
+    //         } as ClienteCreateDto);
             
-            res.status(200).json({
-                ok: true, 
-                cliente
-            });
+    //         res.status(200).json({
+    //             ok: true, 
+    //             cliente
+    //         });
 
-        } catch(error){
-            this.handleException(error, res);
-        }
-    }
+    //     } catch(error){
+    //         this.handleException(error, res);
+    //     }
+    // }
 
 
-    @route('/update/:id')
+    @route('/actualizar/:id')
     @PUT()
     public async update(req: Request, res: Response): Promise<void>{
         try{
@@ -106,27 +106,27 @@ export class clienteController extends BaseController{
     }
 
 
-    @route('/delete/:id')
-    @PUT()
-    public async delete(req: Request, res: Response): Promise<void>{
-        const user = req.user as {id: number, rol: string};
-        const id = parseInt(req.params.id);
+    // @route('/delete/:id')
+    // @PUT()
+    // public async delete(req: Request, res: Response): Promise<void>{
+    //     const user = req.user as {id: number, rol: string};
+    //     const id = parseInt(req.params.id);
 
-        if(user.rol === 'SUPER_ADMIN') {
+    //     if(user.rol === 'SUPER_ADMIN') {
             
-            try {
-                await this.clienteService.delete(id);
+    //         try {
+    //             await this.clienteService.delete(id);
                 
-                res.status(200).json({
-                    ok: true,
-                    msg: "Cliente borrado con exito!"
-                });
+    //             res.status(200).json({
+    //                 ok: true,
+    //                 msg: "Cliente borrado con exito!"
+    //             });
     
-            } catch(error){
-                this.handleException(error, res);
-            }
-        }
-    }
+    //         } catch(error){
+    //             this.handleException(error, res);
+    //         }
+    //     }
+    // }
 
     @route('/obtenerTodo')
     @GET()

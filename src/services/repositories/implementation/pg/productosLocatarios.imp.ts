@@ -72,7 +72,7 @@ export class ProductosLocatariosPGRepository implements ProductosLocatariosRepos
 
     async findById(id: number): Promise<ProductosLocatarios | null> {
         const response: QueryResult = await pool.query(
-                        "SELECT * FROM productos_locatarios WHERE id = $1",
+                        "SELECT * FROM productos_locatarios WHERE id = $1 AND activo = true",
                         [id]
                     );
         if (response.rows.length) return response.rows[0] as ProductosLocatarios;
@@ -80,18 +80,17 @@ export class ProductosLocatariosPGRepository implements ProductosLocatariosRepos
     }
 
 
-
-
     async getAll(): Promise<ProductosLocatarios[] | null> {
-        const response: QueryResult = await pool.query("SELECT * FROM productos_locatarios ORDER BY id DESC");
+        const response: QueryResult = await pool.query("SELECT * FROM productos_locatarios WHERE activo = true ORDER BY id DESC");
 
         if (response.rows.length) return response.rows as ProductosLocatarios[];
         return null;
     }
 
+
     async getByLocatarios(locatarioId: number): Promise<ProductosLocatarios[] | null> {
         const response: QueryResult = await pool.query(
-            "SELECT * FROM productos_locatarios WHERE locatario_id = $1",
+            "SELECT * FROM productos_locatarios WHERE locatario_id = $1 AND activo = true",
             [locatarioId]
         );
 
@@ -110,9 +109,10 @@ export class ProductosLocatariosPGRepository implements ProductosLocatariosRepos
         return null;
     }
 
+
     async getByProductoIdYPlazaId( plazaId: number, productoId: number, locatarioId: number): Promise<ProductosLocatarios[] | null> {
         const response: QueryResult = await pool.query(
-            "SELECT * FROM productos_locatarios WHERE plaza_id = $1 AND producto_id = $2 AND locatario_id = $3",
+            "SELECT * FROM productos_locatarios WHERE plaza_id = $1 AND producto_id = $2 AND locatario_id = $3 AND activo = true",
             [plazaId, productoId, locatarioId]
         );
 
@@ -120,6 +120,7 @@ export class ProductosLocatariosPGRepository implements ProductosLocatariosRepos
         return null;
     }
 
+    
     async getProductosByPlazaYEnPromocion(plazaId: number): Promise<ProductosLocatarios[] | null> {
         const response: QueryResult = await pool.query(
             "select * from productos_locatarios where en_promocion = true AND plaza_id = $1 AND stock = true AND activo = true",

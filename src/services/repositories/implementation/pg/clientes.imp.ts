@@ -101,7 +101,7 @@ export class ClientePGRepository implements ClienteRepository{
 
     async findById(id: number): Promise<Cliente | null> {
         const response: QueryResult = await pool.query(
-            "SELECT * FROM clientes WHERE id = $1",
+            "SELECT * FROM clientes WHERE id = $1 AND activo = true",
             [id]
         );
         if (response.rows.length) return response.rows[0] as Cliente;

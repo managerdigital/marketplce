@@ -18,6 +18,7 @@ import { BalancePGRepository } from './repositories/implementation/pg/balance.im
 import { VentasProductosLocatariosPGRepository } from './repositories/implementation/pg/ventasProductosLocatarios.imp';
 
 import { transporter } from '../common/mailer/mailer';
+import { AdminPGRepository } from './repositories/implementation/pg/admin.imp';
 
 
 export class PedidoService {
@@ -28,7 +29,8 @@ export class PedidoService {
                 private readonly locatarioRepository: LocatarioPGRepository,
                 private readonly productosLocatariosRepository: ProductosLocatariosPGRepository,
                 private readonly balanceRepository: BalancePGRepository,
-                private readonly ventasProductosLocatariosRepository: VentasProductosLocatariosPGRepository) {}
+                private readonly ventasProductosLocatariosRepository: VentasProductosLocatariosPGRepository,
+                private readonly adminRepository: AdminPGRepository) {}
             
 
 
@@ -60,7 +62,7 @@ export class PedidoService {
 
     public async sendEmail(email: string): Promise<void>{
         await transporter.sendMail({
-            from: '"Olvido la contraseña" <dcrubiano01@gmail.com>', // sender address
+            from: '"Olvido la contraseña" <ipes.marketplace.desarrollo@gmail.com>', // sender address
             to: email, // list of receivers
             subject: "Se ha registrado un pedido para tu local", // Subject line
             html: `
@@ -75,19 +77,30 @@ export class PedidoService {
             </div>
             `,
           });   
-          return; 
+        return; 
     }
 
 
- 
+    // TODO: ENVIAR LOS CORREOS A LOS ADMINS QUE ESTAN ENCARGADOS DEL LOCATARIO
     public async store(entry: PedidoCreateDto): Promise<Pedido>{
         await this.verificaIds(entry);
+        const locatario = await this.locatarioRepository.findById(entry.locatorios_id) as Locatario;
+        if(!locatario) throw new ApplicationException("No existe el locatario");
+
+        entry.plaza_id = locatario.plaza_id;
+        
         const pedido = await this.pedidoRepository.store(entry);
         if(!pedido) throw new ApplicationException("Hubo un error");
-        const locatario = await this.locatarioRepository.findById(entry.locatorios_id) as Locatario;
         
         const emailRegex = /^[-\w.%+]{1,64}@(?:[A-Z0-9-]{1,63}\.){1,125}[A-Z]{2,63}$/i;
         if (emailRegex.test(locatario.email)) await this.sendEmail(locatario.email);
+
+        const adminsLocatario = locatario.admin_id;
+        for(let i = 0; i < adminsLocatario.length; i++) {
+            const admin = await this.adminRepository.findById(adminsLocatario[i]);
+            if(!admin) throw new ApplicationException("No existe un admin")
+            if (emailRegex.test(admin.email)) await this.sendEmail(admin.email);
+        }
         
         return pedido;
     }
@@ -103,10 +116,9 @@ export class PedidoService {
 
         originalEntry.plaza_id = entry.plaza_id || originalEntry.plaza_id;
         originalEntry.locatorios_id = entry.locatorios_id || originalEntry.locatorios_id;
-        originalEntry.cliente_id = entry.cliente_id || originalEntry.id;
+        originalEntry.cliente_id = entry.cliente_id || originalEntry.cliente_id;
         originalEntry.productos_locatarios_id = entry.productos_locatarios_id || originalEntry.productos_locatarios_id;
         originalEntry.total = entry.total || originalEntry.total;
-        originalEntry.pagado = entry.pagado || originalEntry.pagado;
         originalEntry.estado = entry.estado;
         
         // Note: ESTADO = entragado(2) ENTONCES PAGADO = TRUE
@@ -120,12 +132,15 @@ export class PedidoService {
             if(!balance) throw new ApplicationException("Hubo un error");
             
             const productosLocatarios = originalEntry.productos_locatarios_id || entry.productos_locatarios_id;
-
             for(let i = 0; i<productosLocatarios.length; i++) {
-                
+
+                const productoLocal = await this.productosLocatariosRepository.findById(productosLocatarios[i])
+                if(!productoLocal) throw new ApplicationException("No existe un producto locatario");
+
                 await this.ventasProductosLocatariosRepository.store({
                     plaza_id: entry.plaza_id || originalEntry.plaza_id,
-                    producto_locatario_id: productosLocatarios[i]
+                    producto_locatario_id: productoLocal.id,
+                    locatario_id: productoLocal.locatario_id
                 } as VentasProductosLocatariosCreateDto);
             }
         }
@@ -136,20 +151,22 @@ export class PedidoService {
     }
 
 
-    public async pagadoYEntregado(id: number): Promise<void>{
-        const entry = await this.pedidoRepository.findById(id);
-        if(!entry) throw new ApplicationException("No existe un pedido con ese id");
+
+
+    // public async pagadoYEntregado(id: number): Promise<void>{
+    //     const entry = await this.pedidoRepository.findById(id);
+    //     if(!entry) throw new ApplicationException("No existe un pedido con ese id");
         
-        const balance = await this.balanceRepository.store({
-            total: entry.total,
-            plaza_id: entry.plaza_id,
-            locatorio_id: entry.locatorios_id,
-            cliente_id: entry.cliente_id
-        } as BalanceCreateDto);
-        if(!balance) throw new ApplicationException("Hubo un error");
+    //     const balance = await this.balanceRepository.store({
+    //         total: entry.total,
+    //         plaza_id: entry.plaza_id,
+    //         locatorio_id: entry.locatorios_id,
+    //         cliente_id: entry.cliente_id
+    //     } as BalanceCreateDto);
+    //     if(!balance) throw new ApplicationException("Hubo un error");
        
-        return await this.pedidoRepository.pagadoYEntregado(id);
-    }
+    //     return await this.pedidoRepository.pagadoYEntregado(id);
+    // }
 
 
     public async findById(id: number): Promise<Pedido>{
@@ -209,6 +226,15 @@ export class PedidoService {
         if(!existeCliente) throw new ApplicationException("No existe ese cliente");
 
         const pedidos = await this.pedidoRepository.cantidadDePedidosPorClienteID(clienteId);
+        if(!pedidos) throw new ApplicationException("No hay pedidos registrados");
+        return pedidos;
+    }
+    
+    public async getPedidosPorCliente(clienteId: number): Promise<Pedido[]>{
+        const existeCliente = await this.clienteRepository.findById(clienteId);
+        if(!existeCliente) throw new ApplicationException("No existe ese cliente");
+
+        const pedidos = await this.pedidoRepository.getPedidosPorCliente(clienteId);
         if(!pedidos) throw new ApplicationException("No hay pedidos registrados");
         return pedidos;
     }

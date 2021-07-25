@@ -1,6 +1,6 @@
   
 import { Request, Response } from 'express';
-import { GET, POST, route } from "awilix-express";
+import { GET, route } from "awilix-express";
 
 import { BaseController } from '../common/controllers/base.controller';
 import { LocalidadService } from '../services/localidad.service';
@@ -14,37 +14,37 @@ export class localidadController extends BaseController{
         super();
     }
 
-    @route('/crear')
-    @POST()
-    public async store(req: Request, res: Response): Promise<void>{
-        const user = req.user as {id: number, rol: string};
+    // @route('/crear')
+    // @POST()
+    // public async store(req: Request, res: Response): Promise<void>{
+    //     const user = req.user as {id: number, rol: string};
 
-        if(user.rol === 'SUPER_ADMIN') {
-            try{
-                const {nombre} = req.body;
+    //     if(user.rol === 'SUPER_ADMIN') {
+    //         try{
+    //             const {nombre} = req.body;
     
-                const existeLocalidad = await this.localidadService.find(0, nombre);
+    //             const existeLocalidad = await this.localidadService.find(0, nombre);
     
-                if(existeLocalidad) {
-                    res.status(404).json({
-                        ok: false,
-                        msg: 'Esta localidad ya esta registrada'
-                    });
-                    return;
-                }
+    //             if(existeLocalidad) {
+    //                 res.status(404).json({
+    //                     ok: false,
+    //                     msg: 'Esta localidad ya esta registrada'
+    //                 });
+    //                 return;
+    //             }
     
-                await this.localidadService.store(nombre);
+    //             await this.localidadService.store(nombre);
     
-                res.status(200).json({
-                    ok: true,
-                    msg: 'Localidad creada correctamente'
-                });
+    //             res.status(200).json({
+    //                 ok: true,
+    //                 msg: 'Localidad creada correctamente'
+    //             });
     
-            } catch(error) {
-                this.handleException(error, res);
-            }
-        }
-    }
+    //         } catch(error) {
+    //             this.handleException(error, res);
+    //         }
+    //     }
+    // }
 
 
     @route('/obtenerTodo')

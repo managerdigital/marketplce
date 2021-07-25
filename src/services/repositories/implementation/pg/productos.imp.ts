@@ -74,7 +74,7 @@ export class ProductosPGRepository implements ProductoRepository {
 
     async findById(id: number): Promise<Productos | null> {
         const response: QueryResult = await pool.query(
-            "SELECT * FROM productos WHERE id = $1",
+            "SELECT * FROM productos WHERE id = $1 AND activo = true",
             [id]
         );
         if (response.rows.length) return response.rows[0] as Productos;
@@ -84,7 +84,7 @@ export class ProductosPGRepository implements ProductoRepository {
 
     async findByCategoriaId(id: number): Promise<Productos[] | null> {
         const response: QueryResult = await pool.query(
-            "select * from productos where $1 = ANY (categorias_id)",
+            "SELECT * FROM productos WHERE $1 = ANY (categorias_id)",
             [id]
         );
         if (response.rows.length) return response.rows as Productos[];
@@ -118,7 +118,7 @@ export class ProductosPGRepository implements ProductoRepository {
 
     async getAll(): Promise<Productos[] | null> {
 
-        const response: QueryResult = await pool.query("select * from productos ORDER BY id DESC");
+        const response: QueryResult = await pool.query("SELECT * FROM productos WHERE activo = true ORDER BY id DESC");
 
         if (response.rows.length) return response.rows as Productos[];
         return null;

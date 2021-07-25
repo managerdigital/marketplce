@@ -9,7 +9,6 @@ import { ProductosLocatariosPGRepository } from './repositories/implementation/p
 import { LocatarioPGRepository } from './repositories/implementation/pg/locatario.imp';
 
 
-
 export class ProductosLocatariosService{
 
     constructor(private readonly productosLocatariosRepository: ProductosLocatariosPGRepository,

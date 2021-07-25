@@ -17,11 +17,10 @@ console.log('APP_ENV: ', process.env.APP_ENV);
 import * as functions from "firebase-functions";
 import express = require('express');
 import cors = require('cors');
+import jwt = require('express-jwt');
 
 import { loadControllers } from 'awilix-express';
-import expressFileUpload = require('express-fileupload');
-// import jwt = require('express-jwt');
-
+// import expressFileUpload = require('express-fileupload');
 
 import  loadContainer from './container';
 
@@ -40,7 +39,7 @@ app.use(cors());
 app.use(express.json());
 
 // Este middleware me da acceso a los files
-app.use(expressFileUpload());
+// app.use(expressFileUpload());
 // app.use(express.urlencoded({extended: true}));
 
 
@@ -48,37 +47,49 @@ app.use(expressFileUpload());
 loadContainer(app);
 
 
-// Uploads controllers
-// app.use(loadControllers(
-//     'controllers/uimagenReturn.controlers.ts',
-//     {cwd: __dirname}
-// ));
+// Controllers
+// Note: Estoy cargando las rutas SIN protección
+app.use(loadControllers(
+    'controllers/plazas.controllers.js',
+    {cwd: __dirname}
+));
+app.use(loadControllers(
+    'controllers/productosLocatarios.controllers.js',
+    {cwd: __dirname}
+));
+app.use(loadControllers(
+    'controllers/boletin.controllers.js',
+    {cwd: __dirname}
+));
+app.use(loadControllers(
+    'controllers/localidad.controllers.js',
+    {cwd: __dirname}
+));
+app.use(loadControllers(
+    'controllers/promociones.controller.js',
+    {cwd: __dirname}
+));
+app.use(loadControllers(
+    'controllers/categoria.controllers.js',
+    {cwd: __dirname}
+));
+app.use(loadControllers(
+    'controllers/locatario.controllers.js',
+    {cwd: __dirname}
+));
 
 
 // JWT
 // Se adjunta una propiedad en cada Request user req.user
 // bearer token 
-// if(process.env.jwt_secret_key) {
-//     app.use(jwt({ 
-//         secret: process.env.jwt_secret_key,
-//         algorithms: ['HS256']
-//     })
-//     .unless({path: 
-//         [
-//             '/', 
-//             '/check',  
-//             '/admins/renewToken', 
-//             '/admins/registerAdmin', 
-//             '/locatarios/descargaPlantilla', 
-//             '/clientes/downladXLSX', 
-//             '/pedidos/downladXLSX',
-//             // '/admins/renewToken'
-//         ]
-//     }));
-// }
+if(process.env.jwt_secret_key) {
+    app.use(jwt({ 
+        secret: process.env.jwt_secret_key,
+        algorithms: ['HS256']
+    }));
+}
 
-
-// Controllers
+// Note: Cargo las rutas para proteger
 app.use(loadControllers(
     'controllers/*.js',
     {cwd: __dirname}
