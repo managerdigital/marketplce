@@ -112,7 +112,7 @@ export class PedidoPGRepository implements PedidoRepository {
 
     async getPedidosPorCliente(clienteId: number): Promise<Pedido[] | null> {
         const response: QueryResult = await pool.query(
-            "SELECT * FROM pedidos WHERE cliente_id = $1 AND estado != '3'",
+            "SELECT * FROM pedidos WHERE cliente_id = $1 AND estado != '3' ORDER BY id DESC LIMIT 5",
             [clienteId]
         );
         if (response.rows.length) return response.rows;

@@ -53,14 +53,14 @@ export class CategoriaPGRepository implements CategoriaRepository{
 
 
    async getAllCategorias(): Promise<Categoria[] | null> {
-        const response: QueryResult = await pool.query("SELECT * FROM categorias ORDER BY id DESC");
+        const response: QueryResult = await pool.query("SELECT * FROM categorias WHERE activo = true ORDER BY id DESC");
         if (!response.rows.length) return null;
         return response.rows;
    }
 
 
    async getAllLimit5(): Promise<Categoria[] | null> {
-    const response: QueryResult = await pool.query("SELECT * FROM categorias ORDER BY id DESC LIMIT 5");
+    const response: QueryResult = await pool.query("SELECT * FROM categorias WHERE activo = true ORDER BY id DESC LIMIT 5");
     if (!response.rows.length) return null;
     return response.rows;
 }
@@ -68,7 +68,7 @@ export class CategoriaPGRepository implements CategoriaRepository{
 
    async findById(id: number): Promise<Categoria | null> {
         const response: QueryResult = await pool.query(
-            "SELECT * FROM categorias WHERE id = $1",
+            "SELECT * FROM categorias WHERE id = $1 AND activo = true",
             [id]
         );
         if (response.rows.length) return response.rows[0] as Categoria;

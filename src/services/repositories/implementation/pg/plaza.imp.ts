@@ -100,7 +100,7 @@ export class PlazaPGRepository implements PlazaRepository{
 
     async getAll(): Promise<Plaza[] | null> {
         const response: QueryResult = await pool.query(
-            "SELECT * FROM plazas ORDER BY id DESC",
+            "SELECT * FROM plazas WHERE activo = true ORDER BY id DESC",
           );
         if (response.rows.length){
             return response.rows as Plaza[];
@@ -141,7 +141,7 @@ export class PlazaPGRepository implements PlazaRepository{
 
     async findById(id: number): Promise<Plaza | null> {
         const response: QueryResult = await pool.query(
-            "SELECT * FROM plazas WHERE id = $1",
+            "SELECT * FROM plazas WHERE id = $1 AND activo = true",
             [id]
         );
 

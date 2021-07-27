@@ -94,6 +94,6 @@ app.use(loadControllers(
     'controllers/*.js',
     {cwd: __dirname}
 ));
-    
+
 export const market = functions.https.onRequest( app );
     

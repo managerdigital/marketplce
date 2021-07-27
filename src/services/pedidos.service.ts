@@ -30,8 +30,7 @@ export class PedidoService {
                 private readonly productosLocatariosRepository: ProductosLocatariosPGRepository,
                 private readonly balanceRepository: BalancePGRepository,
                 private readonly ventasProductosLocatariosRepository: VentasProductosLocatariosPGRepository,
-                private readonly adminRepository: AdminPGRepository) {}
-            
+                private readonly adminRepository: AdminPGRepository) {}        
 
 
 

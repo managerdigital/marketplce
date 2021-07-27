@@ -1,9 +1,9 @@
 import { Request, Response } from 'express';
-import { GET, PUT, POST, route } from "awilix-express";
+import { GET, POST, route } from "awilix-express";
 
 import { BaseController } from '../common/controllers/base.controller';
 
-import { PedidoCreateDto, PedidoUpdateDto } from '../dtos/pedidos.dtos';
+import { PedidoCreateDto } from '../dtos/pedidos.dtos';
 
 import { PedidoService } from '../services/pedidos.service';
 import { LocatarioService } from '../services/locatarios.service';
@@ -51,41 +51,41 @@ export class pedidoController extends BaseController{
         }
     }
 
-    @route('/update/:id')
-    @PUT()
-    public async update(req: Request, res: Response): Promise<void>{
-        try{
-            const id = parseInt(req.params.id);  
+    // @route('/update/:id')
+    // @PUT()
+    // public async update(req: Request, res: Response): Promise<void>{
+    //     try{
+    //         const id = parseInt(req.params.id);  
 
-            const {
-                pasarela_pagos_id,
-                plaza_id, 
-                locatorios_id,
-                cliente_id,
-                productos_locatarios_id, 
-                total, 
-                estado
-            } = req.body;
+    //         const {
+    //             pasarela_pagos_id,
+    //             plaza_id, 
+    //             locatorios_id,
+    //             cliente_id,
+    //             productos_locatarios_id, 
+    //             total, 
+    //             estado
+    //         } = req.body;
             
-            const pedido = await this.pedidoService.update(id, {
-                pasarela_pagos_id,
-                plaza_id,
-                locatorios_id,
-                cliente_id,
-                productos_locatarios_id,
-                estado,
-                total
-            } as PedidoUpdateDto);
+    //         const pedido = await this.pedidoService.update(id, {
+    //             pasarela_pagos_id,
+    //             plaza_id,
+    //             locatorios_id,
+    //             cliente_id,
+    //             productos_locatarios_id,
+    //             estado,
+    //             total
+    //         } as PedidoUpdateDto);
 
-            res.status(200).json({
-                ok: true, 
-                pedido
-            });
+    //         res.status(200).json({
+    //             ok: true, 
+    //             pedido
+    //         });
 
-        } catch(error){
-            this.handleException(error, res);
-        }
-    }
+    //     } catch(error){
+    //         this.handleException(error, res);
+    //     }
+    // }
 
 
     @route('/find/:id')
