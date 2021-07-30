@@ -173,15 +173,18 @@ export class productoLocatariosController extends BaseController{
     }
 
 
-    @route('/obtenerPorLocatarioIDCorto/:locatario_id')
+    @route('/obtenerPorLocatarioIDCorto/:locatarioId')
     @GET()
     public async obtenerPorLocatarioID(req: Request, res: Response): Promise<void>{
-
         try {
-            const locatario_id = parseInt(req.params.locatario_id);  
-            const {desde, hasta} = req.body;
+            const locatarioId = parseInt(req.params.locatarioId);  
+            
+            const {
+                desdeLocatarioId, 
+                limite
+            } = req.body;
 
-            const productos = await this.productosLocatariosService.getByLocatariosPaginado(locatario_id, hasta, desde);
+            const productos = await this.productosLocatariosService.getByLocatariosPaginado(locatarioId, desdeLocatarioId, limite);
             
             const productosReturn = [];
             for(let i = 0; i<productos.length; i++) {

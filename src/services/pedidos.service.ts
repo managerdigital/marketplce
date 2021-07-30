@@ -80,7 +80,6 @@ export class PedidoService {
     }
 
 
-    // TODO: ENVIAR LOS CORREOS A LOS ADMINS QUE ESTAN ENCARGADOS DEL LOCATARIO
     public async store(entry: PedidoCreateDto): Promise<Pedido>{
         await this.verificaIds(entry);
         const locatario = await this.locatarioRepository.findById(entry.locatorios_id) as Locatario;

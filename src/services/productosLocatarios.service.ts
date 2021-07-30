@@ -100,8 +100,14 @@ export class ProductosLocatariosService{
         return productos as ProductosLocatarios[];
     }
 
-    async getByLocatariosPaginado(locatarioId: number, hasta: number, desde: number): Promise<ProductosLocatarios[]> {
-        const productos = await this.productosLocatariosRepository.getByLocatariosPaginado(locatarioId, hasta, desde);
+    async getByLocatariosPaginado(locatarioId: number, desdeLocatarioId: number, limite: number): Promise<ProductosLocatarios[]> {
+        if(!desdeLocatarioId) {
+            const productos = await this.productosLocatariosRepository.getByLocatariosPaginadoHelper(locatarioId, limite);
+            if(!productos) throw new ApplicationException("No hay productos");
+            return productos as ProductosLocatarios[];
+        }
+        
+        const productos = await this.productosLocatariosRepository.getByLocatariosPaginado(locatarioId, desdeLocatarioId, limite);
         if(!productos) throw new ApplicationException("No hay productos");
         return productos as ProductosLocatarios[];
     }

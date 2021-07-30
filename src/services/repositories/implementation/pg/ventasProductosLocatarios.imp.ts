@@ -10,7 +10,6 @@ export class VentasProductosLocatariosPGRepository implements VentasProductosLoc
     
     async store(entry: VentasProductosLocatariosCreateDto): Promise<VentasProductosLocatarios | null> {
         const now = new Date();
-        console.log(entry);
         const res = await pool.query(
              "INSERT INTO ventas_productos_locatarios(plaza_id, producto_locatario_id, locatario_id, created_at, updated_at) VALUES($1, $2, $3, $4, $5) RETURNING id",
              [

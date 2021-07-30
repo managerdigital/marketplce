@@ -117,11 +117,12 @@ export class PlazaService{
         const categoriasReturn = [];
         for(let i=0; i<categorias.length; i++) {
             const entry = await this.categoriaRepository.findById(categorias[i]);
-            if(!entry) throw new ApplicationException("No existe una de las categorias");
-            categoriasReturn.push({
-                id: entry.id,
-                nombre: entry.nombre
-            });
+            if(entry) {
+                categoriasReturn.push({
+                    id: entry.id,
+                    nombre: entry.nombre
+                });
+            } 
         }
         return categoriasReturn as Categoria[];
     }

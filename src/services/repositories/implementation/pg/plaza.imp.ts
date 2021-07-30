@@ -39,7 +39,6 @@ export class PlazaPGRepository implements PlazaRepository{
         if(!plaza) return null;
         return plaza;    
         // if (response.rows.length){
-        //     // TODO: ACA ME IMPRIME LAS PLAZAS AL CREAR
         //     console.log(response.rows);
         //     return response.rows[0] as Plaza;
         // }
@@ -145,7 +144,6 @@ export class PlazaPGRepository implements PlazaRepository{
             [id]
         );
 
-        // TODO: ACA ME IMPRIME LAS PLAZAS AL CREAR
         console.log(response.rows);
 
         if (response.rows.length) return response.rows[0] as Plaza;

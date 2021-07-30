@@ -201,6 +201,23 @@ export class LocatarioPGRepository implements LocatarioRepository {
         return null;
     }
 
+    // TODO: Buscador
+    public async buscadorPorPlazaIdYCategoriaId(plazaId: number, categoriaId: number, texto: string): Promise<Locatario[] | null>{
+        
+        const response: QueryResult = await pool.query(
+            'SELECT * FROM locatarios WHERE plaza_id = $1 AND $2 = ANY (categorias_id) AND (nombre LIKE UPPER("%$3%") OR nombre_local LIKE UPPER("%$4%")) ORDER BY updated_at DESC', 
+            [
+                plazaId,
+                categoriaId,
+                texto,
+                texto
+            ]
+        );
+
+        if (response.rows.length) return response.rows as Locatario[];
+        return null;
+    }
+
     
     public async getLocatariosPorPlaza(plaza_id: number): Promise<Locatario[] | null>{
         
@@ -226,13 +243,27 @@ export class LocatarioPGRepository implements LocatarioRepository {
     }
 
 
-    async getLocatariosPorPlazaPaginado(plazaId: number, hasta: number, desde: number): Promise<Locatario[] | null> {
+    async getLocatariosPorPlazaPaginado(plazaId: number, locatarioId: number, limite: number): Promise<Locatario[] | null> {
         const response: QueryResult = await pool.query(
-            "SELECT * FROM locatarios WHERE plaza_id = $1 LIMIT $2 OFFSET $3",
+            "SELECT * FROM locatarios WHERE plaza_id = $1 AND id > $2 ORDER BY id LIMIT $3 ",
             [
                 plazaId,
-                hasta,
-                desde
+                locatarioId,
+                limite
+            ]
+        );
+
+        if (response.rows.length) return response.rows as Locatario[];
+        return null;
+    }
+
+
+    async getLocatariosPorPlazaPaginadoHelper(plazaId: number, limite: number): Promise<Locatario[] | null> {
+        const response: QueryResult = await pool.query(
+            "SELECT * FROM locatarios WHERE plaza_id = $1 ORDER BY id LIMIT $2 ",
+            [
+                plazaId,
+                limite
             ]
         );
 

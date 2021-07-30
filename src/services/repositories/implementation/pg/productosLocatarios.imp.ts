@@ -143,13 +143,26 @@ export class ProductosLocatariosPGRepository implements ProductosLocatariosRepos
     }
 
 
-    async getByLocatariosPaginado(locatarioId: number, hasta: number, desde: number): Promise<ProductosLocatarios[] | null> {
+    async getByLocatariosPaginado(locatarioId: number, desdeLocatarioId: number, limite: number): Promise<ProductosLocatarios[] | null> {
         const response: QueryResult = await pool.query(
-            "SELECT * FROM productos_locatarios WHERE locatario_id = $1 LIMIT $2 OFFSET $3",
+            "SELECT * FROM productos_locatarios WHERE locatario_id = $1 AND id > $2 ORDER BY id LIMIT $3",
             [
                 locatarioId,
-                hasta,
-                desde
+                desdeLocatarioId,
+                limite
+            ]
+        );
+
+        if (response.rows.length) return response.rows as ProductosLocatarios[];
+        return null;
+    }
+
+    async getByLocatariosPaginadoHelper(locatarioId: number, limite: number): Promise<ProductosLocatarios[] | null> {
+        const response: QueryResult = await pool.query(
+            "SELECT * FROM productos_locatarios WHERE locatario_id = $1 ORDER BY id LIMIT $2",
+            [
+                locatarioId,
+                limite
             ]
         );
 

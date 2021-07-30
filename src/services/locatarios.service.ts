@@ -427,6 +427,16 @@ export class LocatarioService{
         return locatarios;
     }
 
+    public async buscadorPorPlazaIdYCategoriaId(plazaId: number, categoriaId: number, texto: string): Promise<Locatario[]>{
+        const plazaExiste = await this.plazaRepository.findById(plazaId);
+        if(!plazaExiste) throw new ApplicationException("No existe una plaza con ese ID");
+        
+        
+        const locatarios = await this.locatarioRepository.buscadorPorPlazaIdYCategoriaId(plazaId, categoriaId, texto);
+        if(!locatarios) throw new ApplicationException("No existen locatarios");
+        return locatarios;
+    }
+
     
     async getLocatariosPorPlaza(plazaId: number): Promise<Locatario[] >{
         const plazaExiste = await this.plazaRepository.findById(plazaId);
@@ -447,11 +457,17 @@ export class LocatarioService{
     }
 
     
-    async getLocatariosPorPlazaPaginado(plazaId: number, hasta: number, desde: number): Promise<Locatario[] >{
+    async getLocatariosPorPlazaPaginado(plazaId: number, locatarioId: number, limite: number): Promise<Locatario[] >{
         const plazaExiste = await this.plazaRepository.findById(plazaId);
         if(!plazaExiste) throw new ApplicationException("No existe una plaza con ese ID");
         
-        const locatarios = await this.locatarioRepository.getLocatariosPorPlazaPaginado(plazaId, hasta, desde);
+        if(!locatarioId) {
+            const locatarios = await this.locatarioRepository.getLocatariosPorPlazaPaginadoHelper(plazaId, limite);
+            if(!locatarios) throw new ApplicationException("No existen locatarios");
+            return locatarios;
+        }
+
+        const locatarios = await this.locatarioRepository.getLocatariosPorPlazaPaginado(plazaId, locatarioId, limite);
         if(!locatarios) throw new ApplicationException("No existen locatarios");
         return locatarios;
     }

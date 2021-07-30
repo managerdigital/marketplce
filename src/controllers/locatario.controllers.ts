@@ -14,154 +14,6 @@ export class locatarioController extends BaseController{
     }
 
 
-    // @route('/crear')
-    // @POST()
-    // public async store(req: Request, res: Response): Promise<void>{
-
-    //     const user = req.user as {id: number, rol: string};
-    //     const rolAllow = ['SUPER_ADMIN', 'ADMIN_LOCATARIO'];
-        
-    //     if(rolAllow.includes(user.rol)) {
-    //         const { 
-    //             admin_id, 
-    //             plaza_id, 
-    //             nombre_local, 
-    //             numero_local, 
-    //             nombre, 
-    //             apellido, 
-    //             cedula, 
-    //             email, 
-    //             productos_locatarios_id, 
-    //             categorias_id, 
-    //             telefonos, 
-    //             horarios,
-    //             img,
-    //             logo
-    //         } = req.body;
-    
-    //         const emailLower = email.toLowerCase();
-
-    //         try{
-    //             const locatario = await this.locatarioService.store({
-    //                 admin_id,
-    //                 plaza_id,
-    //                 categorias_id,
-    //                 productos_locatarios_id,
-    //                 nombre_local,
-    //                 numero_local,
-    //                 nombre,
-    //                 apellido,
-    //                 cedula,
-    //                 email: emailLower,
-    //                 telefonos,
-    //                 horarios,
-    //                 img, 
-    //                 logo
-    //             } as LocatarioCreateDto);
-    
-    //             res.status(200).json({
-    //                 ok: true,
-    //                 locatario
-    //             });
-    
-    //         }catch(error){
-    //             this.handleException(error, res);
-    //         }
-    //     }
-        
-    // }
-
-
-
-    // @route('/update/:id')
-    // @PUT()
-    // public async update(req: Request, res: Response): Promise<void>{
-
-    //     const user = req.user as {id: number, rol: string};
-
-    //     const rolAllow = ['SUPER_ADMIN', 'ADMIN_LOCATARIO'];
-        
-    //     if(rolAllow.includes(user.rol)) {
-    //         const id = parseInt(req.params.id);  
-    //         // const user = req.user as {id: number, rol: string};
-    //         const { 
-    //             admin_id, 
-    //             plaza_id, 
-    //             nombre_local, 
-    //             numero_local, 
-    //             nombre, 
-    //             apellido, 
-    //             cedula, 
-    //             email, 
-    //             categorias_id, 
-    //             productos_locatarios_id, 
-    //             telefonos, 
-    //             horarios, 
-    //             activo,
-    //             img,
-    //             logo
-    //         } = req.body;
-            
-    //         try {
-    //             await this.locatarioService.update(id, {
-    //                 admin_id,
-    //                 plaza_id,
-    //                 categorias_id,
-    //                 productos_locatarios_id,
-    //                 nombre_local,
-    //                 numero_local,
-    //                 nombre,
-    //                 apellido,
-    //                 cedula,
-    //                 email,
-    //                 telefonos,
-    //                 horarios,
-    //                 activo,
-    //                 img,
-    //                 logo
-    //             } as LocatarioUpdateDto);
-    
-    //             res.status(200).json({
-    //                 ok: true,
-    //                 msg: "Local actualizado con exito!"
-    //             });
-    //         } catch(error){
-    //             this.handleException(error, res);
-    //         }
-    //     }
-    // }
-
-
-
-    // @route('/delete/:id')
-    // @PUT()
-    // public async delete(req: Request, res: Response): Promise<void>{
-
-    //     const user = req.user as {id: number, rol: string};
-
-    //     const rolAllow = ['SUPER_ADMIN', 'ADMIN_LOCATARIO'];
-        
-    //     if(rolAllow.includes(user.rol)) {
-    //         const id = parseInt(req.params.id);  
-    
-    //         try {
-    
-    //             await this.locatarioService.delete(id);
-                
-    //             res.status(200).json({
-    //                 ok: true,
-    //                 msg: "Local borrada con exito!"
-    //             });
-    
-    //         } catch(error){
-    //             this.handleException(error, res);
-    //         }
-    //     }
-    // }
-
-
-
-
     @route('/obtenerTodo')
     @GET()
     public async getAll(req: Request, res: Response): Promise<void>{
@@ -285,6 +137,28 @@ export class locatarioController extends BaseController{
     }
 
 
+
+    @route('/buscadorPorPlazaIdYCategoriaId/:plazaid/:categoriaid/:texto')
+    @GET()
+    public async buscadorPorPlazaIdYCategoriaId(req: Request, res: Response): Promise<void>{
+        try{
+            const plaza_id = parseInt(req.params.plazaid);  
+            const categoria_id = parseInt(req.params.categoriaid);  
+            const texto = req.params.texto;
+
+            const locatarios = await this.locatarioService.buscadorPorPlazaIdYCategoriaId(plaza_id, categoria_id, texto);
+
+            res.status(200).json({
+                ok: true,
+                locatarios
+            });
+
+        }catch(error){
+            this.handleException(error, res);
+        }
+    }
+
+
     @route('/locatariosPorPlaza/:plazaid')
     @GET()
     public async getLocatariosPorPlaza(req: Request, res: Response): Promise<void>{
@@ -351,10 +225,10 @@ export class locatarioController extends BaseController{
     @POST()
     public async locatariosPorPlazaCortoPaginado(req: Request, res: Response): Promise<void>{
         try{
-            const {desde, hasta} = req.body;
             const plaza_id = parseInt(req.params.plazaid);  
+            const { locatarioId, limite } = req.body;
 
-            const locatarios = await this.locatarioService.getLocatariosPorPlazaPaginado(plaza_id, hasta, desde);
+            const locatarios = await this.locatarioService.getLocatariosPorPlazaPaginado(plaza_id, locatarioId, limite);
             
             res.status(200).json({
                 ok: true,

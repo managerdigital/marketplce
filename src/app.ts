@@ -77,6 +77,10 @@ app.use(loadControllers(
     'controllers/locatario.controllers.js',
     {cwd: __dirname}
 ));
+app.use(loadControllers(
+    'controllers/visitasLocatario.controllers.js',
+    {cwd: __dirname}
+));
 
 
 // JWT

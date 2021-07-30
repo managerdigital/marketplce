@@ -28,14 +28,6 @@ export class PromocionesPGRepository implements PromocionesRepository {
         return producto as Promociones;
     }
     
-    // id: number,
-    // producto_id: number[],
-    // plazas_id: number[],
-    // categorias_id: number[],
-    // imagen: string,
-    // activo: boolean;
-    // created_at?: Date,
-    // updated_at?: Date,
     
     // TODO: ACTUALIZAR EL ACTIVO
     async update(id: number, entry: Promociones): Promise<void> {

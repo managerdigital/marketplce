@@ -20,6 +20,7 @@ import { VentasProductosLocatariosService } from './services/ventasProductosLoca
 import { FavoritoService } from './services/favorito.service';
 import { VentasCategoriasService } from './services/ventasCategorias.service';
 import { BoletinesService } from './services/boletines.service';
+import { VisitasLocatariosService } from './services/vistasLocatarios.service';
 
 
 import { AdminPGRepository } from './services/repositories/implementation/pg/admin.imp';
@@ -38,6 +39,7 @@ import { VentasProductosLocatariosPGRepository } from './services/repositories/i
 import { FavoritosPGRepository } from './services/repositories/implementation/pg/favoritos.imp';
 import { VentasCategoriasPGRepository } from './services/repositories/implementation/pg/ventasCategorias.imp';
 import { BoletinesPGRepository } from './services/repositories/implementation/pg/boletines.imp';
+import { VisitasLocatariosPGRepository } from './services/repositories/implementation/pg/visitasLocatarios.imp';
 
 
 
@@ -66,6 +68,7 @@ export default (app: express.Application): void => {
         favoritoRepository: asClass(FavoritosPGRepository).scoped(),
         ventasCategoriasRepository: asClass(VentasCategoriasPGRepository).scoped(),
         boletinesRepository: asClass(BoletinesPGRepository).scoped(),
+        visitasLocatariosRepository: asClass(VisitasLocatariosPGRepository).scoped(),
         
         // Services
         adminService: asClass(AdminService).scoped(),
@@ -84,6 +87,7 @@ export default (app: express.Application): void => {
         favoritoService: asClass(FavoritoService).scoped(),
         ventasCategoriasService: asClass(VentasCategoriasService).scoped(),
         boletinesService: asClass(BoletinesService).scoped(),
+        visitasLocatariosService: asClass(VisitasLocatariosService).scoped(),
         
         testService: asClass(TestService).scoped(),
     });
